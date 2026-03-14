@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Help from "./pages/Help";
-import Whitepaper from "./pages/Whitepaper";
+import Whitepaper from "./pages/Whitepaper.tsx";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
