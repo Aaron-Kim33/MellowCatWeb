@@ -43,7 +43,7 @@ const Help = () => {
           <section>
             <h2 className="text-2xl font-semibold mb-3">문의하기</h2>
             <p className="text-muted-foreground leading-relaxed">
-              추가 질문이 있으시면 언제든지 연락해주세요.
+              추가 질문이 있으시면 언제든지 하단의 연락처로 연락해주세요.
             </p>
           </section>
         </div>
