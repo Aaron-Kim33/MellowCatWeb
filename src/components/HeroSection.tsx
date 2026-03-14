@@ -46,7 +46,7 @@ const HeroSection = () => {
                 무료 다운로드 (Win)
               </a>
             </Button>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+           
             <Button variant="hero" size="lg" className="min-w-[220px] h-14 text-base" asChild>
               <a href="https://github.com/Aaron-Kim33/MellowCat/releases/download/v0.0.1/MellowCat_Mac.zip">
                 <Download className="mr-2 h-5 w-5" />
