@@ -8,6 +8,7 @@ const navItems = [
   { label: "다운로드", href: "#home" },
   { label: "결제", href: "#payment" },
   { label: "기부", href: "#donate" },
+  { label: "도움말", href: "/help", isRoute: true },
   { label: "백서", href: "/whitepaper", isRoute: true },
 ];
 
