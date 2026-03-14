@@ -6,8 +6,21 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Help from "./pages/Help";
 import NotFound from "./pages/NotFound";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import ReactGA from "react-ga4";
+
 
 const queryClient = new QueryClient();
+const location = useLocation();
+
+  useEffect(() => {
+    // navigate로 페이지가 바뀔 때마다(location 변경 시) 실행됩니다.
+    ReactGA.send({ 
+      hitType: "pageview", 
+      page: location.pathname 
+    });
+  }, [location]);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
