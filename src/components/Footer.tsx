@@ -4,8 +4,8 @@ const socialLinks = [
   { icon: <Github className="h-5 w-5" />, href: "https://github.com/Aaron-Kim33/MellowCat", label: "GitHub" },
   { icon: <MessageCircle className="h-5 w-5" />, href: "https://discord.gg/eUFmjFME", label: "Discord" },
   { icon: <Instagram className="h-5 w-5" />, href: "https://www.threads.com/@mellowcat2026", label: "Instagram" },
-  { icon: <Mail className="h-5 w-5" />, href: "mailto:gakphe@gmail.com", label: "Email" },
-  { icon: <Send className="h-5 w-5" />, href: "https://t.me", label: "Telegram" },
+  { icon: <Mail className="h-5 w-5" />, href: "mailto:hi.mellowcat@gmail.com", label: "Email" },
+  { icon: <Send className="h-5 w-5" />, href: "https://t.me/", label: "Telegram" },
 ];
 
 const Footer = () => {
