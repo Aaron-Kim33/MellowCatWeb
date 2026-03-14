@@ -12,15 +12,19 @@ import ReactGA from "react-ga4";
 
 
 const queryClient = new QueryClient();
-const location = useLocation();
+// 1. 페이지 뷰를 추적하는 별도의 컴포넌트 생성
+const GAListener = () => {
+  const location = useLocation();
 
   useEffect(() => {
-    // navigate로 페이지가 바뀔 때마다(location 변경 시) 실행됩니다.
     ReactGA.send({ 
       hitType: "pageview", 
-      page: location.pathname 
+      page: location.pathname + location.search 
     });
   }, [location]);
+
+  return null; // 화면에 아무것도 그리지 않음
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -28,6 +32,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+      <GAListener />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/help" element={<Help />} />
