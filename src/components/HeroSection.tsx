@@ -41,14 +41,14 @@ const HeroSection = () => {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button variant="hero" size="lg" className="min-w-[220px] h-14 text-base" asChild>
-              <a href="https://github.com/Aaron-Kim33/MellowCat/releases/download/v0.0.1/MellowCat_Win.exe">
+              <a href="https://github.com/Aaron-Kim33/MellowCat/releases/latest/download/MellowCat_Win.exe">
                 <Download className="mr-2 h-5 w-5" />
                 무료 다운로드 (Win)
               </a>
             </Button>
            
             <Button variant="hero" size="lg" className="min-w-[220px] h-14 text-base" asChild>
-              <a href="https://github.com/Aaron-Kim33/MellowCat/releases/download/v0.0.1/MellowCat_Mac.zip">
+              <a href="https://github.com/Aaron-Kim33/MellowCat/releases/latest/download/MellowCat_Mac.zip">
                 <Download className="mr-2 h-5 w-5" />
                 무료 다운로드 (Mac)
               </a>
