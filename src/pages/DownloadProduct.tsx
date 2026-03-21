@@ -89,15 +89,18 @@ export const ClaudeCodeDownloadPage = () => (
   <DownloadProduct
     badge="ClaudeCode Product"
     title="ClaudeCode Launcher"
-    description="ClaudeCode 런처를 위한 제품 자리입니다. 실제 다운로드 링크가 준비되면 이 페이지에서 바로 연결할 수 있도록 구조를 먼저 잡아두었습니다."
+    description="ClaudeCode 전용 런처 다운로드 페이지입니다. 운영체제에 맞는 최신 설치 파일을 선택해서 바로 시작할 수 있습니다."
     links={[
       {
-        label: "출시 준비 중",
-        href: "https://github.com/Aaron-Kim33/MellowCat",
-        external: true,
+        label: "무료 다운로드 (Win)",
+        href: "https://github.com/Aaron-Kim33/mellowcat-claude-v2/releases/latest/download/MellowCat-Claude-win-x64.exe",
+      },
+      {
+        label: "무료 다운로드 (Mac)",
+        href: "https://github.com/Aaron-Kim33/mellowcat-claude-v2/releases/latest/download/MellowCat-Claude-mac-arm64.dmg",
       },
     ]}
-    note="ClaudeCode 전용 다운로드 링크만 전달받으면 버튼 목적지만 바꿔서 바로 연결할 수 있습니다."
+    note="현재는 GitHub latest 릴리스 경로로 연결되어 있습니다. 자산 파일명이 다음 버전에서도 유지되면 자동으로 최신 릴리스를 받게 됩니다."
   />
 );
 
