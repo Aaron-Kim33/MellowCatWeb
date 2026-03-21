@@ -55,7 +55,7 @@ const Help = () => {
             <div className="space-y-4">
               <div className="p-4 rounded-lg border border-border">
                 <h3 className="font-medium mb-1">어떻게 시작하나요?</h3>
-                <p className="text-sm text-muted-foreground">홈 페이지에서 다운로드 버튼을 눌러 시작할 수 있습니다.</p>
+                <p className="text-sm text-muted-foreground">상단 Download 메뉴에서 원하는 런처를 선택해 시작할 수 있습니다.</p>
               </div>
               <div className="p-4 rounded-lg border border-border">
                 <h3 className="font-medium mb-2">Windows에서 Docker 및 가상화 설정</h3>

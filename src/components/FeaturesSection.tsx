@@ -26,7 +26,7 @@ const features = [
 
 const FeaturesSection = () => {
   return (
-    <section className="py-24">
+    <section id="products" className="py-24">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-display font-bold text-center mb-4 text-foreground">
           왜 <span className="text-primary">MellowCat</span>인가요?

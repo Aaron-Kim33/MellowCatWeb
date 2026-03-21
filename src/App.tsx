@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import ReactGA from "react-ga4";
+import { ClaudeCodeDownloadPage, OpenClawDownloadPage } from "./pages/DownloadProduct";
 
 
 
@@ -37,6 +38,8 @@ const App = () => (
       <GAListener />
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/download/openclaw" element={<OpenClawDownloadPage />} />
+          <Route path="/download/claudecode" element={<ClaudeCodeDownloadPage />} />
           <Route path="/help" element={<Help />} />
           <Route path="/whitepaper" element={<Whitepaper />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
