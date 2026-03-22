@@ -38,12 +38,14 @@ const HeroSection = () => {
 
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button variant="hero" size="lg" className="min-w-[220px] h-14 text-base" asChild>
-              <a href="#products">런처 살펴보기</a>
+              <a href="https://github.com/Aaron-Kim33/MellowCat" target="_blank" rel="noopener noreferrer">
+                Star on GitHub (OpenClaw)
+              </a>
             </Button>
 
             <Button variant="hero-outline" size="lg" className="min-w-[220px] h-14 text-base" asChild>
-              <a href="https://github.com/Aaron-Kim33/MellowCat" target="_blank" rel="noopener noreferrer">
-                Star on GitHub
+              <a href="https://github.com/Aaron-Kim33/mellowcat-claude-v2" target="_blank" rel="noopener noreferrer">
+                Star on GitHub (ClaudeCode)
               </a>
             </Button>
           </div>

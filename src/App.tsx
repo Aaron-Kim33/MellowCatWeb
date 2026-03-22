@@ -4,13 +4,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
-import Help from "./pages/Help";
 import Whitepaper from "./pages/Whitepaper.tsx";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import ReactGA from "react-ga4";
 import { ClaudeCodeDownloadPage, OpenClawDownloadPage } from "./pages/DownloadProduct";
+import HelpRedirect, { ClaudeCodeHelpPage, OpenClawHelpPage } from "./pages/Help";
 
 
 
@@ -40,7 +40,9 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/download/openclaw" element={<OpenClawDownloadPage />} />
           <Route path="/download/claudecode" element={<ClaudeCodeDownloadPage />} />
-          <Route path="/help" element={<Help />} />
+          <Route path="/help" element={<HelpRedirect />} />
+          <Route path="/help/openclaw" element={<OpenClawHelpPage />} />
+          <Route path="/help/claudecode" element={<ClaudeCodeHelpPage />} />
           <Route path="/whitepaper" element={<Whitepaper />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

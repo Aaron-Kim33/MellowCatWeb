@@ -7,7 +7,6 @@ const navItems = [
   { label: "홈", href: "/#home" },
   { label: "결제", href: "/#payment" },
   { label: "기부", href: "/#donate" },
-  { label: "도움말", href: "/help", isRoute: true },
   { label: "백서", href: "/whitepaper", isRoute: true },
 ];
 
@@ -24,9 +23,23 @@ const downloadItems = [
   },
 ];
 
+const helpItems = [
+  {
+    label: "OpenClaw",
+    description: "Product Help",
+    href: "/help/openclaw",
+  },
+  {
+    label: "ClaudeCode",
+    description: "Product Help",
+    href: "/help/claudecode",
+  },
+];
+
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [mobileDownloadsOpen, setMobileDownloadsOpen] = useState(false);
+  const [mobileHelpOpen, setMobileHelpOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleNavClick = (item: typeof navItems[0]) => {
@@ -62,6 +75,28 @@ const Navbar = () => {
             <div className="invisible absolute left-1/2 top-full w-64 -translate-x-1/2 pt-3 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
               <div className="rounded-2xl border border-border bg-background/95 p-2 shadow-lg backdrop-blur">
                 {downloadItems.map((item) => (
+                  <Link
+                    key={item.label}
+                    to={item.href}
+                    className="block rounded-xl px-4 py-3 transition-colors hover:bg-accent"
+                  >
+                    <p className="text-sm font-semibold text-foreground">{item.label}</p>
+                    <p className="text-xs text-muted-foreground">{item.description}</p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="group relative">
+            <button className="flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+              Help
+              <ChevronDown className="h-4 w-4" />
+            </button>
+
+            <div className="invisible absolute left-1/2 top-full w-64 -translate-x-1/2 pt-3 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+              <div className="rounded-2xl border border-border bg-background/95 p-2 shadow-lg backdrop-blur">
+                {helpItems.map((item) => (
                   <Link
                     key={item.label}
                     to={item.href}
@@ -122,6 +157,30 @@ const Navbar = () => {
           {mobileDownloadsOpen && (
             <div className="mb-2 rounded-2xl border border-border bg-card/70 p-2">
               {downloadItems.map((item) => (
+                <Link
+                  key={item.label}
+                  to={item.href}
+                  className="block rounded-xl px-3 py-3 transition-colors hover:bg-accent"
+                  onClick={() => setOpen(false)}
+                >
+                  <p className="text-sm font-semibold text-foreground">{item.label}</p>
+                  <p className="text-xs text-muted-foreground">{item.description}</p>
+                </Link>
+              ))}
+            </div>
+          )}
+
+          <button
+            className="flex w-full items-center justify-between py-3 text-left text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+            onClick={() => setMobileHelpOpen(!mobileHelpOpen)}
+          >
+            Help
+            <ChevronDown className={`h-4 w-4 transition-transform ${mobileHelpOpen ? "rotate-180" : ""}`} />
+          </button>
+
+          {mobileHelpOpen && (
+            <div className="mb-2 rounded-2xl border border-border bg-card/70 p-2">
+              {helpItems.map((item) => (
                 <Link
                   key={item.label}
                   to={item.href}
