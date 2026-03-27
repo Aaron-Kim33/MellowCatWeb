@@ -10,7 +10,7 @@ import {
   readPaymentHandoff,
   resolvePaymentHandoff,
   type CheckoutSessionResponse,
-  type PaymentApiError,
+  type PaymentClientError,
   type ResolvedPaymentContext,
 } from "@/lib/payment";
 import { ArrowLeft, LoaderCircle } from "lucide-react";
@@ -20,10 +20,10 @@ import { Link, useLocation } from "react-router-dom";
 type ResolveState =
   | { status: "loading" }
   | { status: "ready"; payload: ResolvedPaymentContext }
-  | { status: "already-owned"; error: PaymentApiError }
+  | { status: "already-owned"; error: PaymentClientError }
   | { status: "error"; title: string; message: string };
 
-const errorMessages: Record<PaymentApiError["code"], { title: string; message: string }> = {
+const errorMessages: Record<PaymentClientError["code"], { title: string; message: string }> = {
   HANDOFF_INVALID: {
     title: "This checkout link is invalid.",
     message: "Return to MellowCat and start checkout again.",
@@ -47,6 +47,10 @@ const errorMessages: Record<PaymentApiError["code"], { title: string; message: s
   CHECKOUT_DISABLED: {
     title: "Checkout is temporarily unavailable.",
     message: "Return to MellowCat and try again later.",
+  },
+  NETWORK_ERROR: {
+    title: "Payment backend is unreachable.",
+    message: "The checkout page could not reach the payment API. Verify the API base URL and backend deployment.",
   },
 };
 
@@ -110,7 +114,7 @@ const PaymentPage = () => {
 
     setCheckoutBusy(true);
 
-    const payload = (await createCheckoutSession(handoffToken)) as CheckoutSessionResponse | PaymentApiError;
+    const payload = (await createCheckoutSession(handoffToken)) as CheckoutSessionResponse | PaymentClientError;
     if (!payload.ok) {
       setCheckoutBusy(false);
       if (payload.code === "ALREADY_OWNED") {

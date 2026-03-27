@@ -36,6 +36,14 @@ export type CheckoutSessionResponse = {
   paymentId: string;
 };
 
+export const NETWORK_ERROR_CODE = "NETWORK_ERROR" as const;
+
+export type PaymentClientError = {
+  ok: false;
+  code: PaymentErrorCode | typeof NETWORK_ERROR_CODE;
+  message: string;
+};
+
 export const getPaymentApiBaseUrl = () => {
   const explicitBase = import.meta.env.VITE_PAYMENT_API_BASE_URL ?? import.meta.env.VITE_API_BASE_URL ?? "/api/payment";
   return explicitBase.replace(/\/$/, "");
@@ -43,22 +51,30 @@ export const getPaymentApiBaseUrl = () => {
 
 const buildPaymentApiUrl = (path: string) => `${getPaymentApiBaseUrl()}${path}`;
 
-async function postJson<T>(path: string, body: Record<string, string>): Promise<T | PaymentApiError> {
-  const response = await fetch(buildPaymentApiUrl(path), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
+async function postJson<T>(path: string, body: Record<string, string>): Promise<T | PaymentClientError> {
+  try {
+    const response = await fetch(buildPaymentApiUrl(path), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
 
-  const payload = (await response.json()) as T | PaymentApiError;
+    const payload = (await response.json()) as T | PaymentApiError;
 
-  if (!response.ok) {
-    return payload as PaymentApiError;
+    if (!response.ok) {
+      return payload as PaymentClientError;
+    }
+
+    return payload;
+  } catch {
+    return {
+      ok: false,
+      code: NETWORK_ERROR_CODE,
+      message: "Unable to reach the payment backend. Check the API base URL or backend availability.",
+    };
   }
-
-  return payload;
 }
 
 export const resolvePaymentHandoff = (handoffToken: string) =>
