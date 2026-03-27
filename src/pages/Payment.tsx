@@ -14,14 +14,28 @@ import {
   type ResolvedPaymentContext,
 } from "@/lib/payment";
 import { ArrowLeft, LoaderCircle } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 type ResolveState =
   | { status: "loading" }
   | { status: "ready"; payload: ResolvedPaymentContext }
   | { status: "already-owned"; error: PaymentClientError }
+  | { status: "success" }
+  | { status: "cancel" }
   | { status: "error"; title: string; message: string };
+
+const renderPaymentShell = (content: ReactNode) => (
+  <div className="min-h-screen bg-background">
+    <Navbar />
+    <main className="relative overflow-hidden pt-16">
+      <div className="pointer-events-none absolute top-24 left-1/4 h-[320px] w-[320px] rounded-full bg-primary/10 blur-[100px]" />
+      <div className="pointer-events-none absolute right-1/4 bottom-0 h-[260px] w-[260px] rounded-full bg-accent/10 blur-[100px]" />
+      {content}
+    </main>
+    <Footer />
+  </div>
+);
 
 const errorMessages: Record<PaymentClientError["code"], { title: string; message: string }> = {
   HANDOFF_INVALID: {
@@ -61,6 +75,18 @@ const PaymentPage = () => {
 
   useEffect(() => {
     let cancelled = false;
+    const params = new URLSearchParams(location.search);
+    const paymentStatus = params.get("status");
+
+    if (paymentStatus === "success") {
+      setState({ status: "success" });
+      return;
+    }
+
+    if (paymentStatus === "cancel" || paymentStatus === "canceled") {
+      setState({ status: "cancel" });
+      return;
+    }
 
     const handoffToken = readPaymentHandoff(location.search);
     if (!handoffToken) {
@@ -130,97 +156,88 @@ const PaymentPage = () => {
     window.location.assign(payload.checkoutUrl);
   };
 
-  return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+  if (state.status === "success") {
+    return <PaymentSuccessPage />;
+  }
 
-      <main className="relative overflow-hidden pt-16">
-        <div className="pointer-events-none absolute top-24 left-1/4 h-[320px] w-[320px] rounded-full bg-primary/10 blur-[100px]" />
-        <div className="pointer-events-none absolute right-1/4 bottom-0 h-[260px] w-[260px] rounded-full bg-accent/10 blur-[100px]" />
+  if (state.status === "cancel") {
+    return <PaymentCancelPage />;
+  }
 
-        <section className="container relative z-10 mx-auto max-w-4xl px-4 py-20">
-          <Button variant="ghost" className="mb-8" asChild>
-            <Link to="/">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Return to MellowCat
-            </Link>
-          </Button>
+  return renderPaymentShell(
+    <section className="container relative z-10 mx-auto max-w-4xl px-4 py-20">
+      <Button variant="ghost" className="mb-8" asChild>
+        <Link to="/">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Return to MellowCat
+        </Link>
+      </Button>
 
-          <div className="mb-8 max-w-2xl">
-            <div className="mb-4 inline-block rounded-full border border-primary/20 bg-primary/10 px-4 py-2">
-              <span className="text-sm font-display font-semibold text-primary">Payment</span>
-            </div>
-            <h1 className="mb-3 text-4xl font-display font-bold text-foreground md:text-5xl">Secure checkout</h1>
-            <p className="text-muted-foreground">
-              MellowCat launcher initiated this payment flow with a one-time handoff token. Product ownership is granted
-              only after backend webhook confirmation.
+      <div className="mb-8 max-w-2xl">
+        <div className="mb-4 inline-block rounded-full border border-primary/20 bg-primary/10 px-4 py-2">
+          <span className="text-sm font-display font-semibold text-primary">Payment</span>
+        </div>
+        <h1 className="mb-3 text-4xl font-display font-bold text-foreground md:text-5xl">Secure checkout</h1>
+        <p className="text-muted-foreground">
+          MellowCat launcher initiated this payment flow with a one-time handoff token. Product ownership is granted
+          only after backend webhook confirmation.
+        </p>
+      </div>
+
+      {state.status === "loading" && (
+        <div className="rounded-[2rem] border border-border bg-card/90 p-12 text-center soft-shadow">
+          <LoaderCircle className="mx-auto mb-4 h-8 w-8 animate-spin text-primary" />
+          <h2 className="mb-2 text-2xl font-display font-bold text-foreground">Loading checkout</h2>
+          <p className="text-sm text-muted-foreground">Resolving your payment handoff and product details...</p>
+        </div>
+      )}
+
+      {state.status === "error" && <PaymentErrorState title={state.title} message={state.message} />}
+
+      {state.status === "already-owned" && (
+        <PaymentErrorState title={errorMessages.ALREADY_OWNED.title} message={errorMessages.ALREADY_OWNED.message} />
+      )}
+
+      {state.status === "ready" && (
+        <div className="grid gap-6 lg:grid-cols-[1.3fr_0.9fr]">
+          <ResolvedProductCard payload={state.payload} />
+
+          <div className="rounded-[2rem] border border-border bg-card/90 p-8 soft-shadow">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary">Next step</p>
+            <h2 className="mb-3 text-2xl font-display font-bold text-foreground">Continue to payment</h2>
+            <p className="mb-6 text-sm leading-relaxed text-muted-foreground">
+              You will be redirected to the payment provider to complete this purchase. Ownership will refresh in
+              MellowCat after the provider webhook confirms payment.
+            </p>
+            <CheckoutButton busy={checkoutBusy} onClick={handleCheckout} />
+            <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+              If this tab was opened by accident, return to MellowCat and restart checkout from the launcher.
             </p>
           </div>
-
-          {state.status === "loading" && (
-            <div className="rounded-[2rem] border border-border bg-card/90 p-12 text-center soft-shadow">
-              <LoaderCircle className="mx-auto mb-4 h-8 w-8 animate-spin text-primary" />
-              <h2 className="mb-2 text-2xl font-display font-bold text-foreground">Loading checkout</h2>
-              <p className="text-sm text-muted-foreground">Resolving your payment handoff and product details...</p>
-            </div>
-          )}
-
-          {state.status === "error" && <PaymentErrorState title={state.title} message={state.message} />}
-
-          {state.status === "already-owned" && (
-            <PaymentErrorState title={errorMessages.ALREADY_OWNED.title} message={errorMessages.ALREADY_OWNED.message} />
-          )}
-
-          {state.status === "ready" && (
-            <div className="grid gap-6 lg:grid-cols-[1.3fr_0.9fr]">
-              <ResolvedProductCard payload={state.payload} />
-
-              <div className="rounded-[2rem] border border-border bg-card/90 p-8 soft-shadow">
-                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary">Next step</p>
-                <h2 className="mb-3 text-2xl font-display font-bold text-foreground">Continue to payment</h2>
-                <p className="mb-6 text-sm leading-relaxed text-muted-foreground">
-                  You will be redirected to the payment provider to complete this purchase. Ownership will refresh in
-                  MellowCat after the provider webhook confirms payment.
-                </p>
-                <CheckoutButton busy={checkoutBusy} onClick={handleCheckout} />
-                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-                  If this tab was opened by accident, return to MellowCat and restart checkout from the launcher.
-                </p>
-              </div>
-            </div>
-          )}
-        </section>
-      </main>
-
-      <Footer />
-    </div>
+        </div>
+      )}
+    </section>,
   );
 };
 
-export const PaymentSuccessPage = () => (
-  <div className="min-h-screen bg-background">
-    <Navbar />
-    <main className="container mx-auto max-w-3xl px-4 py-36">
+export const PaymentSuccessPage = () =>
+  renderPaymentShell(
+    <section className="container mx-auto max-w-3xl px-4 py-36">
       <PaymentSuccessHint
         title="Payment received."
-        message="Return to MellowCat. Your access will refresh automatically after backend confirmation completes."
+        message="Return to MellowCat. Your access should refresh automatically, or use Refresh Purchases in the launcher."
       />
-    </main>
-    <Footer />
-  </div>
-);
+    </section>,
+  );
 
-export const PaymentCancelPage = () => (
-  <div className="min-h-screen bg-background">
-    <Navbar />
-    <main className="container mx-auto max-w-3xl px-4 py-36">
+export const PaymentCancelPage = () =>
+  renderPaymentShell(
+    <section className="container mx-auto max-w-3xl px-4 py-36">
       <PaymentErrorState
-        title="Payment was canceled."
-        message="No purchase was completed. Return to MellowCat if you want to start checkout again."
+        title="Checkout was canceled."
+        message="You can return to MellowCat and try again."
       />
-    </main>
-    <Footer />
-  </div>
-);
+    </section>,
+  );
 
 export default PaymentPage;
