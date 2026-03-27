@@ -45,7 +45,7 @@ export type PaymentClientError = {
 };
 
 export const getPaymentApiBaseUrl = () => {
-  const explicitBase = import.meta.env.VITE_PAYMENT_API_BASE_URL ?? import.meta.env.VITE_API_BASE_URL ?? "/api/payment";
+  const explicitBase = import.meta.env.VITE_PAYMENT_API_BASE_URL ?? import.meta.env.VITE_API_BASE_URL ?? "";
   return explicitBase.replace(/\/$/, "");
 };
 
@@ -78,10 +78,10 @@ async function postJson<T>(path: string, body: Record<string, string>): Promise<
 }
 
 export const resolvePaymentHandoff = (handoffToken: string) =>
-  postJson<ResolvedPaymentContext>("/resolve-handoff", { handoffToken });
+  postJson<ResolvedPaymentContext>("/api/payment/resolve-handoff", { handoffToken });
 
 export const createCheckoutSession = (handoffToken: string) =>
-  postJson<CheckoutSessionResponse>("/create-checkout-session", { handoffToken });
+  postJson<CheckoutSessionResponse>("/api/payment/create-checkout-session", { handoffToken });
 
 export const readPaymentHandoff = (search: string) => new URLSearchParams(search).get("handoff");
 
