@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { CreditCard, Heart } from "lucide-react";
+import { CreditCard } from "lucide-react";
 import { motion } from "framer-motion";
 
 const PaymentSection = () => {
   return (
-    <section id="payment" className="py-24">
+    <section id="donate" className="py-24">
       <div className="container mx-auto px-4">
         <motion.div
           className="max-w-2xl mx-auto text-center"

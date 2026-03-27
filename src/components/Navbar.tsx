@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 const navItems = [
   { label: "홈", href: "/#home" },
-  { label: "결제", href: "/#payment" },
+  { label: "결제", href: "/payment", isRoute: true },
   { label: "기부", href: "/#donate" },
   { label: "백서", href: "/whitepaper", isRoute: true },
 ];

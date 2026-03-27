@@ -11,6 +11,7 @@ import { useLocation } from "react-router-dom";
 import ReactGA from "react-ga4";
 import { ClaudeCodeDownloadPage, OpenClawDownloadPage } from "./pages/DownloadProduct";
 import HelpRedirect, { ClaudeCodeHelpPage, OpenClawHelpPage } from "./pages/Help";
+import PaymentPage, { PaymentCancelPage, PaymentSuccessPage } from "./pages/Payment";
 
 
 
@@ -38,6 +39,9 @@ const App = () => (
       <GAListener />
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/payment/success" element={<PaymentSuccessPage />} />
+          <Route path="/payment/cancel" element={<PaymentCancelPage />} />
           <Route path="/download/openclaw" element={<OpenClawDownloadPage />} />
           <Route path="/download/claudecode" element={<ClaudeCodeDownloadPage />} />
           <Route path="/help" element={<HelpRedirect />} />
