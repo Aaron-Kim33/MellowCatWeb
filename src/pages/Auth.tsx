@@ -384,6 +384,11 @@ export const AccountPage = () => {
           <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
             <p className="font-semibold text-primary">Password updated successfully.</p>
             <p className="mt-1 text-sm text-muted-foreground">Your web session was refreshed and you can continue using MellowCat.</p>
+            <div className="mt-4">
+              <Button variant="hero-outline" asChild>
+                <Link to="/login">Sign in again</Link>
+              </Button>
+            </div>
           </div>
         )}
 
