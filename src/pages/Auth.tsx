@@ -183,17 +183,16 @@ export const SignupPage = () => {
       return;
     }
 
-    setSuccess("Verification email sent. Check your inbox to finish account setup.");
-
     if (source === "launcher" || launcherRequest) {
-      navigate(withLauncherContext("/launcher-auth", location.search), {
-        replace: true,
-        state: {
-          verificationPending: true,
-          email,
-        },
-      });
+      const params = new URLSearchParams(location.search);
+      if (launcherRequest) {
+        params.set("requestId", launcherRequest);
+      }
+      navigate(`/launcher-auth?${params.toString()}`, { replace: true });
+      return;
     }
+
+    setSuccess("Account created successfully. You can sign in now.");
   };
 
   return (
@@ -251,8 +250,8 @@ export const SignupPage = () => {
 export const LauncherAuthPage = () => {
   const location = useLocation();
   const context = readLauncherContext(location.search);
-  const requestId = context.launcherRequest;
-  const state = location.state as { verificationPending?: boolean; email?: string } | null;
+  const params = new URLSearchParams(location.search);
+  const requestId = params.get("requestId") ?? context.launcherRequest;
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [error, setError] = useState<string | null>(null);
 
@@ -320,13 +319,6 @@ export const LauncherAuthPage = () => {
               {error ?? "This launcher auth request expired or failed. Return to MellowCat and try again."}
             </p>
           </div>
-        )}
-
-        {state?.verificationPending && (
-          <p className="text-sm text-muted-foreground">
-            Verification email sent to <span className="font-medium text-foreground">{state.email}</span>. Finish email verification before
-            launching browser sign-in again if your backend requires verified accounts.
-          </p>
         )}
 
         {requestId && (
