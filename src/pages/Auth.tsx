@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  buildGoogleOauthStartUrl,
   completeLauncherAuth,
   loginWithPassword,
   readLauncherContext,
@@ -76,10 +77,21 @@ export const LoginPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { source, launcherRequest } = readLauncherContext(location.search);
+  const params = new URLSearchParams(location.search);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const oauthError = params.get("oauth");
+  const oauthMessage = params.get("message");
+  const oauthCopy =
+    oauthError === "error"
+      ? {
+          access_denied: "Google sign-in was canceled before completion.",
+          invalid_state: "Google sign-in expired or lost its login state. Start again from MellowCat.",
+          missing_code: "Google sign-in did not return an authorization code. Please try again.",
+        }[oauthMessage ?? ""] ?? "Google sign-in could not be completed."
+      : null;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -131,14 +143,18 @@ export const LoginPage = () => {
           />
         </div>
 
-        {error && <p className="rounded-2xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">{error}</p>}
+        {(error || oauthCopy) && (
+          <p className="rounded-2xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+            {error ?? oauthCopy}
+          </p>
+        )}
 
         <Button type="submit" variant="hero" size="lg" className="h-12 w-full" disabled={busy}>
           {busy ? "Signing in..." : "Sign in"}
         </Button>
 
-        <Button type="button" variant="hero-outline" size="lg" className="h-12 w-full" disabled>
-          Google sign-in (coming soon)
+        <Button type="button" variant="hero-outline" size="lg" className="h-12 w-full" asChild>
+          <a href={buildGoogleOauthStartUrl(location.search)}>Continue with Google</a>
         </Button>
 
         <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
@@ -343,7 +359,10 @@ export const LauncherAuthPage = () => {
 
 export const AccountPage = () => {
   const location = useLocation();
+  const params = new URLSearchParams(location.search);
   const state = location.state as { email?: string; displayName?: string } | null;
+  const provider = params.get("provider");
+  const loginStatus = params.get("login");
 
   return (
     <AuthCard
@@ -352,6 +371,13 @@ export const AccountPage = () => {
       description="This is a frontend placeholder until a web session/account endpoint is wired up."
     >
       <div className="space-y-5">
+        {loginStatus === "success" && provider === "google" && (
+          <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
+            <p className="font-semibold text-primary">Google sign-in completed successfully.</p>
+            <p className="mt-1 text-sm text-muted-foreground">Your MellowCat account is now signed in with Google.</p>
+          </div>
+        )}
+
         <div className="rounded-2xl bg-secondary/40 p-4">
           <p className="mb-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">Display name</p>
           <p className="font-semibold text-foreground">{state?.displayName || "Signed-in user"}</p>

@@ -133,3 +133,20 @@ export const withLauncherContext = (pathname: string, search: string) => {
   const query = params.toString();
   return query ? `${pathname}?${query}` : pathname;
 };
+
+export const buildGoogleOauthStartUrl = (search: string) => {
+  const params = new URLSearchParams();
+  const context = readLauncherContext(search);
+
+  if (context.source) {
+    params.set("source", context.source);
+  }
+
+  if (context.launcherRequest) {
+    params.set("launcherRequest", context.launcherRequest);
+  }
+
+  const query = params.toString();
+  const path = "/api/auth/oauth/google/start";
+  return `${buildAuthApiUrl(path)}${query ? `?${query}` : ""}`;
+};
