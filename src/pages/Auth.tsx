@@ -386,7 +386,7 @@ export const AccountPage = () => {
             <p className="mt-1 text-sm text-muted-foreground">Your web session was refreshed and you can continue using MellowCat.</p>
             <div className="mt-4">
               <Button variant="hero-outline" asChild>
-                <Link to="/login">Sign in again</Link>
+                <Link to={withLauncherContext("/login", location.search)}>Sign in again</Link>
               </Button>
             </div>
           </div>
@@ -503,11 +503,7 @@ export const ResetPasswordPage = () => {
     }
 
     if (context.source === "launcher" || context.launcherRequest) {
-      const params = new URLSearchParams(location.search);
-      if (context.launcherRequest) {
-        params.set("requestId", context.launcherRequest);
-      }
-      navigate(`/launcher-auth?${params.toString()}`, { replace: true });
+      navigate(withLauncherContext("/account?passwordReset=success", location.search), { replace: true });
       return;
     }
 
