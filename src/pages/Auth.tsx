@@ -8,6 +8,8 @@ import {
   completeLauncherAuth,
   loginWithPassword,
   readLauncherContext,
+  requestPasswordReset,
+  resetPassword,
   signupWithPassword,
   withLauncherContext,
   type AuthApiError,
@@ -25,6 +27,10 @@ const authCopy: Record<AuthApiError["code"], string> = {
   EMAIL_ALREADY_EXISTS: "An account with that email already exists.",
   WEAK_PASSWORD: "Choose a stronger password before continuing.",
   EXPIRED_LAUNCHER_AUTH_REQUEST: "This launcher sign-in request expired. Start again from MellowCat.",
+  RESET_NOT_FOUND: "This reset link is invalid.",
+  RESET_USED: "This reset link has already been used.",
+  RESET_EXPIRED: "This reset link expired. Request a new password reset.",
+  USER_NOT_FOUND: "No account was found for that email.",
   OAUTH_CANCELED: "Google sign-in was canceled before completion.",
   SERVER_ERROR: "The auth server returned an unexpected error.",
   NETWORK_ERROR: "Unable to reach the auth backend right now.",
@@ -161,7 +167,9 @@ export const LoginPage = () => {
           <Link className="transition-colors hover:text-primary" to={withLauncherContext("/signup", location.search)}>
             Create an account
           </Link>
-          <span>Forgot password coming soon</span>
+          <Link className="transition-colors hover:text-primary" to="/forgot-password">
+            Forgot password
+          </Link>
         </div>
       </form>
     </AuthCard>
@@ -363,6 +371,7 @@ export const AccountPage = () => {
   const state = location.state as { email?: string; displayName?: string } | null;
   const provider = params.get("provider");
   const loginStatus = params.get("login");
+  const passwordResetStatus = params.get("passwordReset");
 
   return (
     <AuthCard
@@ -371,6 +380,13 @@ export const AccountPage = () => {
       description="This is a frontend placeholder until a web session/account endpoint is wired up."
     >
       <div className="space-y-5">
+        {passwordResetStatus === "success" && (
+          <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
+            <p className="font-semibold text-primary">Password updated successfully.</p>
+            <p className="mt-1 text-sm text-muted-foreground">Your web session was refreshed and you can continue using MellowCat.</p>
+          </div>
+        )}
+
         {loginStatus === "success" && provider === "google" && (
           <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
             <p className="font-semibold text-primary">Google sign-in completed successfully.</p>
@@ -390,6 +406,135 @@ export const AccountPage = () => {
           Purchases, linked providers, and logout will live here once the backend account/session endpoints are finalized.
         </p>
       </div>
+    </AuthCard>
+  );
+};
+
+export const ForgotPasswordPage = () => {
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [resetUrl, setResetUrl] = useState<string | null>(null);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setBusy(true);
+    setError(null);
+    setSuccess(null);
+    setResetUrl(null);
+
+    const response = await requestPasswordReset(email);
+    setBusy(false);
+
+    if (!response.ok) {
+      setError(authCopy[response.code] ?? "Password reset could not be started.");
+      return;
+    }
+
+    setSuccess("If an account exists for this email, a password reset link is now ready.");
+    if (response.resetUrl) {
+      setResetUrl(response.resetUrl);
+    }
+  };
+
+  return (
+    <AuthCard
+      badge="Forgot Password"
+      title="Reset your password"
+      description="Enter your account email and we will prepare the next password reset step."
+    >
+      <form className="space-y-6" onSubmit={handleSubmit}>
+        <div className="space-y-2">
+          <Label htmlFor="forgot-email">Email</Label>
+          <Input id="forgot-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
+        </div>
+
+        {error && <p className="rounded-2xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">{error}</p>}
+        {success && <p className="rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary">{success}</p>}
+
+        <Button type="submit" variant="hero" size="lg" className="h-12 w-full" disabled={busy}>
+          {busy ? "Preparing reset..." : "Send reset link"}
+        </Button>
+
+        {resetUrl && (
+          <Button type="button" variant="hero-outline" size="lg" className="h-12 w-full" asChild>
+            <a href={resetUrl}>Continue to reset password</a>
+          </Button>
+        )}
+
+        <div className="text-sm text-muted-foreground">
+          Back to{" "}
+          <Link className="transition-colors hover:text-primary" to="/login">
+            sign in
+          </Link>
+        </div>
+      </form>
+    </AuthCard>
+  );
+};
+
+export const ResetPasswordPage = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const token = new URLSearchParams(location.search).get("token") ?? "";
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setBusy(true);
+    setError(null);
+
+    const response = await resetPassword(token, password);
+    setBusy(false);
+
+    if (!response.ok) {
+      setError(authCopy[response.code] ?? "Password reset could not be completed.");
+      return;
+    }
+
+    navigate("/account?passwordReset=success", { replace: true });
+  };
+
+  return (
+    <AuthCard
+      badge="Reset Password"
+      title="Choose a new password"
+      description="Use the reset token from your password reset link to set a new password for your account."
+    >
+      <form className="space-y-6" onSubmit={handleSubmit}>
+        {!token && (
+          <p className="rounded-2xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+            This reset link is invalid. Request a new password reset from the forgot password page.
+          </p>
+        )}
+
+        <div className="space-y-2">
+          <Label htmlFor="reset-password">New password</Label>
+          <Input
+            id="reset-password"
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            required
+          />
+        </div>
+
+        {error && <p className="rounded-2xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">{error}</p>}
+
+        <Button type="submit" variant="hero" size="lg" className="h-12 w-full" disabled={busy || !token}>
+          {busy ? "Resetting password..." : "Reset password"}
+        </Button>
+
+        <div className="text-sm text-muted-foreground">
+          Need a new link?{" "}
+          <Link className="transition-colors hover:text-primary" to="/forgot-password">
+            Request another reset
+          </Link>
+        </div>
+      </form>
     </AuthCard>
   );
 };

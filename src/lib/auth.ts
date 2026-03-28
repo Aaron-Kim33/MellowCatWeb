@@ -40,6 +40,16 @@ export type LauncherAuthCompleteResponse = {
   ok: true;
 };
 
+export type ForgotPasswordResponse = {
+  ok: true;
+  resetUrl?: string;
+  expiresAt?: string;
+};
+
+export type ResetPasswordResponse = {
+  ok: true;
+};
+
 const getAuthApiBaseUrl = () => {
   const explicitBase =
     import.meta.env.VITE_AUTH_API_BASE_URL ??
@@ -108,6 +118,17 @@ export const signupWithPassword = (body: {
 export const completeLauncherAuth = (requestId: string) =>
   postAuthJson<LauncherAuthCompleteResponse>("/api/auth/launcher/complete", {
     requestId,
+  });
+
+export const requestPasswordReset = (email: string) =>
+  postAuthJson<ForgotPasswordResponse>("/api/auth/forgot-password", {
+    email,
+  });
+
+export const resetPassword = (token: string, password: string) =>
+  postAuthJson<ResetPasswordResponse>("/api/auth/reset-password", {
+    token,
+    password,
   });
 
 export const readLauncherContext = (search: string): LauncherContext => {
