@@ -417,6 +417,7 @@ export const AccountPage = () => {
 
 export const ForgotPasswordPage = () => {
   const location = useLocation();
+  const context = readLauncherContext(location.search);
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -440,7 +441,14 @@ export const ForgotPasswordPage = () => {
 
     setSuccess("If an account exists for this email, a password reset link is now ready.");
     if (response.resetUrl) {
-      setResetUrl(response.resetUrl);
+      const nextUrl = new URL(response.resetUrl, window.location.origin);
+      if (context.source) {
+        nextUrl.searchParams.set("source", context.source);
+      }
+      if (context.launcherRequest) {
+        nextUrl.searchParams.set("launcherRequest", context.launcherRequest);
+      }
+      setResetUrl(nextUrl.toString());
     }
   };
 
@@ -494,11 +502,18 @@ export const ResetPasswordPage = () => {
     setBusy(true);
     setError(null);
 
-    const response = await resetPassword(token, password);
+    const response = await resetPassword(token, password, context.launcherRequest ?? undefined);
     setBusy(false);
 
     if (!response.ok) {
       setError(authCopy[response.code] ?? "Password reset could not be completed.");
+      return;
+    }
+
+    if (response.launcherRequestResolved && context.launcherRequest) {
+      const params = new URLSearchParams(location.search);
+      params.set("requestId", context.launcherRequest);
+      navigate(`/launcher-auth?${params.toString()}`, { replace: true });
       return;
     }
 

@@ -48,6 +48,12 @@ export type ForgotPasswordResponse = {
 
 export type ResetPasswordResponse = {
   ok: true;
+  user?: {
+    id: string;
+    email: string;
+    displayName?: string;
+  };
+  launcherRequestResolved?: boolean;
 };
 
 const getAuthApiBaseUrl = () => {
@@ -125,10 +131,11 @@ export const requestPasswordReset = (email: string) =>
     email,
   });
 
-export const resetPassword = (token: string, password: string) =>
+export const resetPassword = (token: string, password: string, launcherRequest?: string) =>
   postAuthJson<ResetPasswordResponse>("/api/auth/reset-password", {
     token,
     password,
+    launcherRequest: launcherRequest ?? "",
   });
 
 export const readLauncherContext = (search: string): LauncherContext => {
