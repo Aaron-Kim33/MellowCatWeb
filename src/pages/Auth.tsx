@@ -167,7 +167,7 @@ export const LoginPage = () => {
           <Link className="transition-colors hover:text-primary" to={withLauncherContext("/signup", location.search)}>
             Create an account
           </Link>
-          <Link className="transition-colors hover:text-primary" to="/forgot-password">
+          <Link className="transition-colors hover:text-primary" to={withLauncherContext("/forgot-password", location.search)}>
             Forgot password
           </Link>
         </div>
@@ -416,6 +416,7 @@ export const AccountPage = () => {
 };
 
 export const ForgotPasswordPage = () => {
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -470,7 +471,7 @@ export const ForgotPasswordPage = () => {
 
         <div className="text-sm text-muted-foreground">
           Back to{" "}
-          <Link className="transition-colors hover:text-primary" to="/login">
+          <Link className="transition-colors hover:text-primary" to={withLauncherContext("/login", location.search)}>
             sign in
           </Link>
         </div>
@@ -482,6 +483,7 @@ export const ForgotPasswordPage = () => {
 export const ResetPasswordPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const context = readLauncherContext(location.search);
   const token = new URLSearchParams(location.search).get("token") ?? "";
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -497,6 +499,15 @@ export const ResetPasswordPage = () => {
 
     if (!response.ok) {
       setError(authCopy[response.code] ?? "Password reset could not be completed.");
+      return;
+    }
+
+    if (context.source === "launcher" || context.launcherRequest) {
+      const params = new URLSearchParams(location.search);
+      if (context.launcherRequest) {
+        params.set("requestId", context.launcherRequest);
+      }
+      navigate(`/launcher-auth?${params.toString()}`, { replace: true });
       return;
     }
 
@@ -535,7 +546,7 @@ export const ResetPasswordPage = () => {
 
         <div className="text-sm text-muted-foreground">
           Need a new link?{" "}
-          <Link className="transition-colors hover:text-primary" to="/forgot-password">
+          <Link className="transition-colors hover:text-primary" to={withLauncherContext("/forgot-password", location.search)}>
             Request another reset
           </Link>
         </div>
