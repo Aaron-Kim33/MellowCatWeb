@@ -12,6 +12,7 @@ import ReactGA from "react-ga4";
 import { ClaudeCodeDownloadPage, OpenClawDownloadPage } from "./pages/DownloadProduct";
 import HelpRedirect, { ClaudeCodeHelpPage, OpenClawHelpPage } from "./pages/Help";
 import PaymentPage, { PaymentCancelPage, PaymentSuccessPage } from "./pages/Payment";
+import { AccountPage, LauncherAuthPage, LoginPage, SignupPage } from "./pages/Auth";
 
 
 
@@ -39,6 +40,10 @@ const App = () => (
       <GAListener />
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/launcher-auth" element={<LauncherAuthPage />} />
+          <Route path="/account" element={<AccountPage />} />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment/success" element={<PaymentSuccessPage />} />
           <Route path="/payment/cancel" element={<PaymentCancelPage />} />
