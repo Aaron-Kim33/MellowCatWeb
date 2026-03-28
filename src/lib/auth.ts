@@ -36,6 +36,10 @@ export type SignupResponse = {
   email?: string;
 };
 
+export type LauncherAuthCompleteResponse = {
+  ok: true;
+};
+
 const getAuthApiBaseUrl = () => {
   const explicitBase =
     import.meta.env.VITE_AUTH_API_BASE_URL ??
@@ -99,6 +103,11 @@ export const signupWithPassword = (body: {
     displayName: body.displayName ?? "",
     source: body.source ?? "",
     launcherRequest: body.launcherRequest ?? "",
+  });
+
+export const completeLauncherAuth = (requestId: string) =>
+  postAuthJson<LauncherAuthCompleteResponse>("/api/auth/launcher/complete", {
+    requestId,
   });
 
 export const readLauncherContext = (search: string): LauncherContext => {

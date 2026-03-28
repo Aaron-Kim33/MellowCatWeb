@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  completeLauncherAuth,
   loginWithPassword,
   readLauncherContext,
   signupWithPassword,
@@ -11,7 +12,7 @@ import {
   type AuthApiError,
 } from "@/lib/auth";
 import { ArrowLeft } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
@@ -250,8 +251,42 @@ export const SignupPage = () => {
 export const LauncherAuthPage = () => {
   const location = useLocation();
   const context = readLauncherContext(location.search);
-  const requestId = new URLSearchParams(location.search).get("requestId") ?? context.launcherRequest;
+  const requestId = context.launcherRequest;
   const state = location.state as { verificationPending?: boolean; email?: string } | null;
+  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!requestId) {
+      setStatus("error");
+      setError("This launcher sign-in request is missing or invalid.");
+      return;
+    }
+
+    const complete = async () => {
+      const response = await completeLauncherAuth(requestId);
+
+      if (cancelled) {
+        return;
+      }
+
+      if (!response.ok) {
+        setStatus("error");
+        setError(authCopy[response.code] ?? "Launcher sign-in could not be completed.");
+        return;
+      }
+
+      setStatus("success");
+    };
+
+    void complete();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [requestId]);
 
   return (
     <AuthCard
@@ -260,12 +295,32 @@ export const LauncherAuthPage = () => {
       description="The launcher will resolve this browser sign-in through backend API polling."
     >
       <div className="space-y-6">
-        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
-          <p className="mb-2 text-sm font-semibold text-primary">You can return to MellowCat now.</p>
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            Keep the launcher open while it finalizes your launcher session and refreshes account state.
-          </p>
-        </div>
+        {status === "loading" && (
+          <div className="rounded-2xl border border-border bg-secondary/40 p-5">
+            <p className="mb-2 text-sm font-semibold text-foreground">Finalizing your launcher session...</p>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              Keep MellowCat open while the backend links your browser login to the launcher request.
+            </p>
+          </div>
+        )}
+
+        {status === "success" && (
+          <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
+            <p className="mb-2 text-sm font-semibold text-primary">You can return to MellowCat now.</p>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              Keep the launcher open while it finalizes your launcher session and refreshes account state.
+            </p>
+          </div>
+        )}
+
+        {status === "error" && (
+          <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-5">
+            <p className="mb-2 text-sm font-semibold text-destructive">Launcher sign-in could not be completed.</p>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              {error ?? "This launcher auth request expired or failed. Return to MellowCat and try again."}
+            </p>
+          </div>
+        )}
 
         {state?.verificationPending && (
           <p className="text-sm text-muted-foreground">
