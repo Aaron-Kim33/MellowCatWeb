@@ -131,6 +131,15 @@ const Navbar = () => {
           )}
         </div>
 
+        <div className="hidden items-center gap-3 md:flex">
+          <Button variant="ghost" asChild>
+            <Link to="/login">Login</Link>
+          </Button>
+          <Button variant="hero" asChild>
+            <Link to="/signup">Sign up</Link>
+          </Button>
+        </div>
+
         <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen(!open)}>
           {open ? <X /> : <Menu />}
         </Button>
@@ -217,6 +226,19 @@ const Navbar = () => {
               </a>
             ),
           )}
+
+          <div className="mt-3 flex flex-col gap-3 border-t border-border pt-4">
+            <Button variant="ghost" asChild>
+              <Link to="/login" onClick={() => setOpen(false)}>
+                Login
+              </Link>
+            </Button>
+            <Button variant="hero" asChild>
+              <Link to="/signup" onClick={() => setOpen(false)}>
+                Sign up
+              </Link>
+            </Button>
+          </div>
         </div>
       )}
     </nav>

@@ -247,6 +247,7 @@ export const SignupPage = () => {
   const [displayName, setDisplayName] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<AuthApiError["code"] | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [verificationUrl, setVerificationUrl] = useState<string | null>(null);
 
@@ -254,6 +255,7 @@ export const SignupPage = () => {
     event.preventDefault();
     setBusy(true);
     setError(null);
+    setErrorCode(null);
     setSuccess(null);
     setVerificationUrl(null);
 
@@ -267,6 +269,7 @@ export const SignupPage = () => {
     setBusy(false);
 
     if (!response.ok) {
+      setErrorCode(response.code);
       setError(authCopy[response.code]);
       return;
     }
@@ -324,6 +327,20 @@ export const SignupPage = () => {
         </div>
 
         {error && <p className="rounded-2xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">{error}</p>}
+        {errorCode === "EMAIL_ALREADY_EXISTS" && (
+          <div className="rounded-2xl border border-border bg-secondary/40 p-4">
+            <p className="font-semibold text-foreground">이미 가입된 이메일입니다.</p>
+            <p className="mt-1 text-sm text-muted-foreground">로그인하거나 비밀번호를 재설정할 수 있어요.</p>
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+              <Button variant="hero-outline" className="sm:flex-1" asChild>
+                <Link to={withLauncherContext("/login", location.search)}>Log in</Link>
+              </Button>
+              <Button variant="hero-outline" className="sm:flex-1" asChild>
+                <Link to={withLauncherContext("/forgot-password", location.search)}>Forgot password</Link>
+              </Button>
+            </div>
+          </div>
+        )}
         {success && <p className="rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary">{success}</p>}
 
         <Button type="submit" variant="hero" size="lg" className="h-12 w-full" disabled={busy}>
