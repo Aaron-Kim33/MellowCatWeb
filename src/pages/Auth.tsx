@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import {
   buildGoogleOauthStartUrl,
   completeLauncherAuth,
+  getCurrentUser,
   loginWithPassword,
   readLauncherContext,
   requestPasswordReset,
@@ -90,6 +91,7 @@ export const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [resendBusy, setResendBusy] = useState(false);
+  const [sessionChecking, setSessionChecking] = useState(Boolean(launcherRequest));
   const [error, setError] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<AuthApiError["code"] | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -104,6 +106,38 @@ export const LoginPage = () => {
           missing_code: "Google sign-in did not return an authorization code. Please try again.",
         }[oauthMessage ?? ""] ?? "Google sign-in could not be completed."
       : null;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!(source === "launcher" || launcherRequest)) {
+      setSessionChecking(false);
+      return;
+    }
+
+    const checkSession = async () => {
+      const currentUser = await getCurrentUser();
+
+      if (cancelled) {
+        return;
+      }
+
+      if (currentUser && launcherRequest) {
+        const nextSearch = new URLSearchParams(location.search);
+        nextSearch.set("requestId", launcherRequest);
+        navigate(`/launcher-auth?${nextSearch.toString()}`, { replace: true });
+        return;
+      }
+
+      setSessionChecking(false);
+    };
+
+    void checkSession();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [launcherRequest, location.search, navigate, source]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -179,6 +213,14 @@ export const LoginPage = () => {
       title="Sign in to MellowCat"
       description="Use your MellowCat account to unlock purchases, entitlements, and launcher sign-in handoff."
     >
+      {sessionChecking ? (
+        <div className="rounded-2xl border border-border bg-secondary/40 p-5">
+          <p className="mb-2 text-sm font-semibold text-foreground">Checking your web session...</p>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            If you already signed in on the web, MellowCat will continue straight to launcher auth.
+          </p>
+        </div>
+      ) : (
       <form className="space-y-6" onSubmit={handleSubmit}>
         <div className="space-y-2">
           <Label htmlFor="login-email">Email</Label>
@@ -235,6 +277,7 @@ export const LoginPage = () => {
           </Link>
         </div>
       </form>
+      )}
     </AuthCard>
   );
 };
