@@ -34,6 +34,12 @@ export type LoginResponse = {
   };
 };
 
+export type CurrentUser = {
+  id: string;
+  email: string;
+  displayName?: string;
+};
+
 export type SignupResponse = {
   ok: true;
   verificationSent?: boolean;
@@ -94,6 +100,15 @@ const getAuthApiBaseUrl = () => {
 
 const buildAuthApiUrl = (path: string) => `${getAuthApiBaseUrl()}${path}`;
 
+async function readJson(response: Response) {
+  const text = await response.text();
+  if (!text) {
+    return null;
+  }
+
+  return JSON.parse(text) as unknown;
+}
+
 async function postAuthJson<T>(path: string, body: Record<string, string>): Promise<T | AuthApiError> {
   try {
     const response = await fetch(buildAuthApiUrl(path), {
@@ -105,7 +120,7 @@ async function postAuthJson<T>(path: string, body: Record<string, string>): Prom
       body: JSON.stringify(body),
     });
 
-    const payload = (await response.json()) as T | AuthApiError;
+    const payload = (await readJson(response)) as T | AuthApiError;
     if (!response.ok) {
       return payload as AuthApiError;
     }
@@ -117,6 +132,41 @@ async function postAuthJson<T>(path: string, body: Record<string, string>): Prom
       code: "NETWORK_ERROR",
       message: "Unable to reach the auth backend.",
     };
+  }
+}
+
+export async function getCurrentUser(): Promise<CurrentUser | null> {
+  try {
+    const response = await fetch(buildAuthApiUrl("/api/auth/me"), {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const payload = (await readJson(response)) as { ok?: boolean; user?: CurrentUser } | null;
+    return payload?.user ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function logoutCurrentUser(): Promise<boolean> {
+  try {
+    const response = await fetch(buildAuthApiUrl("/api/auth/logout"), {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    });
+
+    return response.ok;
+  } catch {
+    return false;
   }
 }
 

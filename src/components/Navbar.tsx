@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { getCurrentUser, logoutCurrentUser, type CurrentUser } from "@/lib/auth";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -40,12 +41,46 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [mobileDownloadsOpen, setMobileDownloadsOpen] = useState(false);
   const [mobileHelpOpen, setMobileHelpOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+  const [authBusy, setAuthBusy] = useState(true);
+  const [logoutBusy, setLogoutBusy] = useState(false);
   const navigate = useNavigate();
 
   const handleNavClick = (item: typeof navItems[0]) => {
     if (item.isRoute) {
       navigate(item.href);
     }
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadUser = async () => {
+      const user = await getCurrentUser();
+      if (cancelled) {
+        return;
+      }
+
+      setCurrentUser(user);
+      setAuthBusy(false);
+    };
+
+    void loadUser();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const displayName = currentUser?.displayName || currentUser?.email?.split("@")[0] || "Account";
+
+  const handleLogout = async () => {
+    setLogoutBusy(true);
+    await logoutCurrentUser();
+    setCurrentUser(null);
+    setLogoutBusy(false);
+    setOpen(false);
+    navigate("/");
   };
 
   return (
@@ -132,12 +167,25 @@ const Navbar = () => {
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
-          <Button variant="ghost" asChild>
-            <Link to="/login">Login</Link>
-          </Button>
-          <Button variant="hero" asChild>
-            <Link to="/signup">Sign up</Link>
-          </Button>
+          {authBusy ? null : currentUser ? (
+            <>
+              <Button variant="ghost" asChild>
+                <Link to="/account">{displayName}</Link>
+              </Button>
+              <Button variant="hero-outline" onClick={handleLogout} disabled={logoutBusy}>
+                {logoutBusy ? "Logging out..." : "Log out"}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" asChild>
+                <Link to="/login">Login</Link>
+              </Button>
+              <Button variant="hero" asChild>
+                <Link to="/signup">Sign up</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen(!open)}>
@@ -227,18 +275,35 @@ const Navbar = () => {
             ),
           )}
 
-          <div className="mt-3 flex flex-col gap-3 border-t border-border pt-4">
-            <Button variant="ghost" asChild>
-              <Link to="/login" onClick={() => setOpen(false)}>
-                Login
-              </Link>
-            </Button>
-            <Button variant="hero" asChild>
-              <Link to="/signup" onClick={() => setOpen(false)}>
-                Sign up
-              </Link>
-            </Button>
-          </div>
+          {!authBusy && (
+            <div className="mt-3 flex flex-col gap-3 border-t border-border pt-4">
+              {currentUser ? (
+                <>
+                  <Button variant="ghost" asChild>
+                    <Link to="/account" onClick={() => setOpen(false)}>
+                      {displayName}
+                    </Link>
+                  </Button>
+                  <Button variant="hero-outline" onClick={handleLogout} disabled={logoutBusy}>
+                    {logoutBusy ? "Logging out..." : "Log out"}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="ghost" asChild>
+                    <Link to="/login" onClick={() => setOpen(false)}>
+                      Login
+                    </Link>
+                  </Button>
+                  <Button variant="hero" asChild>
+                    <Link to="/signup" onClick={() => setOpen(false)}>
+                      Sign up
+                    </Link>
+                  </Button>
+                </>
+              )}
+            </div>
+          )}
         </div>
       )}
     </nav>
