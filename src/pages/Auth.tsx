@@ -10,7 +10,9 @@ import {
   readLauncherContext,
   requestPasswordReset,
   resetPassword,
+  sendVerificationEmail,
   signupWithPassword,
+  verifyEmail,
   withLauncherContext,
   type AuthApiError,
 } from "@/lib/auth";
@@ -87,7 +89,11 @@ export const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [resendBusy, setResendBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<AuthApiError["code"] | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [verificationUrl, setVerificationUrl] = useState<string | null>(null);
   const oauthError = params.get("oauth");
   const oauthMessage = params.get("message");
   const oauthCopy =
@@ -103,11 +109,15 @@ export const LoginPage = () => {
     event.preventDefault();
     setBusy(true);
     setError(null);
+    setErrorCode(null);
+    setSuccess(null);
+    setVerificationUrl(null);
 
     const response = await loginWithPassword({ email, password, source: source ?? undefined, launcherRequest: launcherRequest ?? undefined });
     setBusy(false);
 
     if (!response.ok) {
+      setErrorCode(response.code);
       setError(authCopy[response.code]);
       return;
     }
@@ -124,6 +134,43 @@ export const LoginPage = () => {
         displayName: response.user.displayName ?? "",
       },
     });
+  };
+
+  const handleResendVerification = async () => {
+    if (!email) {
+      setError("Enter your email address first so we know where to send the verification link.");
+      return;
+    }
+
+    setResendBusy(true);
+    setError(null);
+    setSuccess(null);
+    setVerificationUrl(null);
+
+    const response = await sendVerificationEmail(email);
+    setResendBusy(false);
+
+    if (!response.ok) {
+      setError(authCopy[response.code] ?? "Verification email could not be sent.");
+      return;
+    }
+
+    setSuccess(
+      response.emailSent
+        ? "Verification email sent. Check your inbox."
+        : "Verification is ready. Continue with the fallback link below.",
+    );
+
+    if (response.verificationUrl) {
+      const nextUrl = new URL(response.verificationUrl, window.location.origin);
+      if (source) {
+        nextUrl.searchParams.set("source", source);
+      }
+      if (launcherRequest) {
+        nextUrl.searchParams.set("launcherRequest", launcherRequest);
+      }
+      setVerificationUrl(nextUrl.toString());
+    }
   };
 
   return (
@@ -155,6 +202,8 @@ export const LoginPage = () => {
           </p>
         )}
 
+        {success && <p className="rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary">{success}</p>}
+
         <Button type="submit" variant="hero" size="lg" className="h-12 w-full" disabled={busy}>
           {busy ? "Signing in..." : "Sign in"}
         </Button>
@@ -162,6 +211,20 @@ export const LoginPage = () => {
         <Button type="button" variant="hero-outline" size="lg" className="h-12 w-full" asChild>
           <a href={buildGoogleOauthStartUrl(location.search)}>Continue with Google</a>
         </Button>
+
+        {errorCode === "EMAIL_NOT_VERIFIED" && (
+          <>
+            <Button type="button" variant="hero-outline" size="lg" className="h-12 w-full" disabled={resendBusy} onClick={handleResendVerification}>
+              {resendBusy ? "Sending verification..." : "Resend verification email"}
+            </Button>
+
+            {verificationUrl && (
+              <Button type="button" variant="hero-outline" size="lg" className="h-12 w-full" asChild>
+                <a href={verificationUrl}>Continue to verify email</a>
+              </Button>
+            )}
+          </>
+        )}
 
         <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
           <Link className="transition-colors hover:text-primary" to={withLauncherContext("/signup", location.search)}>
@@ -178,7 +241,6 @@ export const LoginPage = () => {
 
 export const SignupPage = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const { source, launcherRequest } = readLauncherContext(location.search);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -186,12 +248,14 @@ export const SignupPage = () => {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [verificationUrl, setVerificationUrl] = useState<string | null>(null);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setBusy(true);
     setError(null);
     setSuccess(null);
+    setVerificationUrl(null);
 
     const response = await signupWithPassword({
       email,
@@ -207,12 +271,18 @@ export const SignupPage = () => {
       return;
     }
 
-    if (source === "launcher" || launcherRequest) {
-      const params = new URLSearchParams(location.search);
-      if (launcherRequest) {
-        params.set("requestId", launcherRequest);
+    if (response.emailSent) {
+      setSuccess("Verification email sent. Check your inbox.");
+      if (response.verificationUrl) {
+        const nextUrl = new URL(response.verificationUrl, window.location.origin);
+        if (source) {
+          nextUrl.searchParams.set("source", source);
+        }
+        if (launcherRequest) {
+          nextUrl.searchParams.set("launcherRequest", launcherRequest);
+        }
+        setVerificationUrl(nextUrl.toString());
       }
-      navigate(`/launcher-auth?${params.toString()}`, { replace: true });
       return;
     }
 
@@ -259,6 +329,12 @@ export const SignupPage = () => {
         <Button type="submit" variant="hero" size="lg" className="h-12 w-full" disabled={busy}>
           {busy ? "Creating account..." : "Create account"}
         </Button>
+
+        {verificationUrl && (
+          <Button type="button" variant="hero-outline" size="lg" className="h-12 w-full" asChild>
+            <a href={verificationUrl}>Continue to verify email</a>
+          </Button>
+        )}
 
         <div className="text-sm text-muted-foreground">
           Already have an account?{" "}
@@ -439,7 +515,11 @@ export const ForgotPasswordPage = () => {
       return;
     }
 
-    setSuccess("If an account exists for this email, a password reset link is now ready.");
+    setSuccess(
+      response.emailSent
+        ? "Check your email for the password reset link."
+        : "If an account exists for this email, a password reset link is now ready.",
+    );
     if (response.resetUrl) {
       const nextUrl = new URL(response.resetUrl, window.location.origin);
       if (context.source) {
@@ -484,6 +564,94 @@ export const ForgotPasswordPage = () => {
           </Link>
         </div>
       </form>
+    </AuthCard>
+  );
+};
+
+export const VerifyEmailPage = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const context = readLauncherContext(location.search);
+  const token = new URLSearchParams(location.search).get("token") ?? "";
+  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!token) {
+      setStatus("error");
+      setError("This verification link is invalid.");
+      return;
+    }
+
+    const run = async () => {
+      const response = await verifyEmail(token, context.launcherRequest ?? undefined);
+
+      if (cancelled) {
+        return;
+      }
+
+      if (!response.ok) {
+        setStatus("error");
+        setError(authCopy[response.code] ?? "Email verification could not be completed.");
+        return;
+      }
+
+      if (response.launcherRequestResolved && context.launcherRequest) {
+        const params = new URLSearchParams(location.search);
+        params.set("requestId", context.launcherRequest);
+        navigate(`/launcher-auth?${params.toString()}`, { replace: true });
+        return;
+      }
+
+      setStatus("success");
+    };
+
+    void run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [context.launcherRequest, location.search, navigate, token]);
+
+  return (
+    <AuthCard
+      badge="Verify Email"
+      title="Verify your email"
+      description="We are confirming your email address with the verification token from your inbox."
+    >
+      <div className="space-y-6">
+        {status === "loading" && (
+          <div className="rounded-2xl border border-border bg-secondary/40 p-5">
+            <p className="mb-2 text-sm font-semibold text-foreground">Verifying your email...</p>
+            <p className="text-sm leading-relaxed text-muted-foreground">This may take a moment.</p>
+          </div>
+        )}
+
+        {status === "success" && (
+          <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
+            <p className="mb-2 text-sm font-semibold text-primary">Email verified successfully.</p>
+            <p className="text-sm leading-relaxed text-muted-foreground">You can now continue to sign in with your MellowCat account.</p>
+          </div>
+        )}
+
+        {status === "error" && (
+          <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-5">
+            <p className="mb-2 text-sm font-semibold text-destructive">Email verification failed.</p>
+            <p className="text-sm leading-relaxed text-muted-foreground">{error}</p>
+          </div>
+        )}
+
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Button variant="hero" asChild>
+            <Link to={withLauncherContext("/login", location.search)}>Go to login</Link>
+          </Button>
+          <Button variant="hero-outline" asChild>
+            <Link to="/">Return to site</Link>
+          </Button>
+        </div>
+      </div>
     </AuthCard>
   );
 };

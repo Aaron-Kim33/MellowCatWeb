@@ -10,6 +10,10 @@ export type AuthApiErrorCode =
   | "EMAIL_NOT_VERIFIED"
   | "EMAIL_ALREADY_EXISTS"
   | "WEAK_PASSWORD"
+  | "RESET_NOT_FOUND"
+  | "RESET_USED"
+  | "RESET_EXPIRED"
+  | "USER_NOT_FOUND"
   | "EXPIRED_LAUNCHER_AUTH_REQUEST"
   | "OAUTH_CANCELED"
   | "SERVER_ERROR"
@@ -32,8 +36,19 @@ export type LoginResponse = {
 
 export type SignupResponse = {
   ok: true;
-  verificationRequired?: boolean;
+  verificationSent?: boolean;
+  emailSent?: boolean;
+  verificationUrl?: string | null;
+  verificationExpiresAt?: string;
   email?: string;
+};
+
+export type SendVerificationResponse = {
+  ok: true;
+  verificationSent?: boolean;
+  emailSent?: boolean;
+  verificationUrl?: string | null;
+  verificationExpiresAt?: string;
 };
 
 export type LauncherAuthCompleteResponse = {
@@ -42,11 +57,23 @@ export type LauncherAuthCompleteResponse = {
 
 export type ForgotPasswordResponse = {
   ok: true;
+  resetRequested?: boolean;
+  emailSent?: boolean;
   resetUrl?: string;
   expiresAt?: string;
 };
 
 export type ResetPasswordResponse = {
+  ok: true;
+  user?: {
+    id: string;
+    email: string;
+    displayName?: string;
+  };
+  launcherRequestResolved?: boolean;
+};
+
+export type VerifyEmailResponse = {
   ok: true;
   user?: {
     id: string;
@@ -126,6 +153,11 @@ export const completeLauncherAuth = (requestId: string) =>
     requestId,
   });
 
+export const sendVerificationEmail = (email: string) =>
+  postAuthJson<SendVerificationResponse>("/api/auth/send-verification", {
+    email,
+  });
+
 export const requestPasswordReset = (email: string) =>
   postAuthJson<ForgotPasswordResponse>("/api/auth/forgot-password", {
     email,
@@ -135,6 +167,12 @@ export const resetPassword = (token: string, password: string, launcherRequest?:
   postAuthJson<ResetPasswordResponse>("/api/auth/reset-password", {
     token,
     password,
+    launcherRequest: launcherRequest ?? "",
+  });
+
+export const verifyEmail = (token: string, launcherRequest?: string) =>
+  postAuthJson<VerifyEmailResponse>("/api/auth/verify-email", {
+    token,
     launcherRequest: launcherRequest ?? "",
   });
 

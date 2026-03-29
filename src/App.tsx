@@ -12,7 +12,7 @@ import ReactGA from "react-ga4";
 import { ClaudeCodeDownloadPage, OpenClawDownloadPage } from "./pages/DownloadProduct";
 import HelpRedirect, { ClaudeCodeHelpPage, OpenClawHelpPage } from "./pages/Help";
 import PaymentPage, { PaymentCancelPage, PaymentSuccessPage } from "./pages/Payment";
-import { AccountPage, ForgotPasswordPage, LauncherAuthPage, LoginPage, ResetPasswordPage, SignupPage } from "./pages/Auth";
+import { AccountPage, ForgotPasswordPage, LauncherAuthPage, LoginPage, ResetPasswordPage, SignupPage, VerifyEmailPage } from "./pages/Auth";
 
 
 
@@ -43,6 +43,7 @@ const App = () => (
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/launcher-auth" element={<LauncherAuthPage />} />
           <Route path="/account" element={<AccountPage />} />
