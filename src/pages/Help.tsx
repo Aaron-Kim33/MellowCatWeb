@@ -334,6 +334,13 @@ export const ClaudeCodeHelpPage = () => (
                   </pre>
                   <p>위 예시라면 관리자 ID는 <code>987654321</code>입니다.</p>
                 </div>
+
+                <div>
+                  <h3 className="font-medium text-foreground">5) MellowCat 연동 완료 확인</h3>
+                  <p>
+                    이제 텔레그램과 MellowCat이 연동되었습니다. 연동한 Bot에서 <code>/help</code> 혹은 <code>/shortlist</code>를 입력해서 시작해보세요.
+                  </p>
+                </div>
               </div>
             </details>
 
