@@ -18,34 +18,26 @@ const HeroSection = () => {
             animate={{ y: [0, -8, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
           >
-            🐱
+            ðŸ±
           </motion.div>
 
           <div className="mb-6 inline-block rounded-full border border-primary/20 bg-primary/10 px-5 py-2">
-            <span className="text-sm font-display font-semibold text-primary">One Brand, Multiple Launchers</span>
+            <span className="text-sm font-display font-semibold text-primary">MellowCat Launcher</span>
           </div>
 
-          <h1 className="mb-6 text-5xl font-display font-bold tracking-tight text-foreground md:text-7xl">
-            MellowCat
-          </h1>
+          <h1 className="mb-6 text-5xl font-display font-bold tracking-tight text-foreground md:text-7xl">MellowCat</h1>
 
           <p className="mx-auto mb-3 max-w-3xl text-lg font-medium text-muted-foreground md:text-xl">
-            OpenClaw와 ClaudeCode를 위한 런처를 하나의 브랜드 안에서 더 부드럽게 만나보세요.
+            MellowCat Launcher로 AI 워크플로우를 더 부드럽게 시작하고 관리해보세요.
           </p>
           <p className="mx-auto mb-10 max-w-2xl text-sm text-muted-foreground">
-            다운로드는 상단의 Download 메뉴에서 제품별로 선택할 수 있습니다.
+            다운로드와 도움말은 상단 메뉴에서 바로 확인할 수 있습니다.
           </p>
 
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Button variant="hero" size="lg" className="min-w-[220px] h-14 text-base" asChild>
-              <a href="https://github.com/Aaron-Kim33/MellowCat" target="_blank" rel="noopener noreferrer">
-                Star on GitHub (OpenClaw)
-              </a>
-            </Button>
-
-            <Button variant="hero-outline" size="lg" className="min-w-[220px] h-14 text-base" asChild>
+            <Button variant="hero" size="lg" className="h-14 min-w-[240px] text-base" asChild>
               <a href="https://github.com/Aaron-Kim33/mellowcat-claude-v2" target="_blank" rel="noopener noreferrer">
-                Star on GitHub (ClaudeCode)
+                Star on GitHub (MellowCat Launcher)
               </a>
             </Button>
           </div>

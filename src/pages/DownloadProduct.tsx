@@ -1,13 +1,12 @@
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, ExternalLink } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ArrowLeft, Download } from "lucide-react";
+import { Link, Navigate } from "react-router-dom";
 
 type DownloadLink = {
   label: string;
   href: string;
-  external?: boolean;
 };
 
 type DownloadProductProps = {
@@ -44,12 +43,8 @@ const DownloadProduct = ({ badge, title, description, links, note }: DownloadPro
             <div className="grid gap-4 sm:grid-cols-2">
               {links.map((link) => (
                 <Button key={link.label} variant="hero" size="lg" className="h-14 text-base" asChild>
-                  <a
-                    href={link.href}
-                    target={link.external ? "_blank" : undefined}
-                    rel={link.external ? "noopener noreferrer" : undefined}
-                  >
-                    {link.external ? <ExternalLink className="h-5 w-5" /> : <Download className="h-5 w-5" />}
+                  <a href={link.href}>
+                    <Download className="h-5 w-5" />
                     {link.label}
                   </a>
                 </Button>
@@ -66,30 +61,13 @@ const DownloadProduct = ({ badge, title, description, links, note }: DownloadPro
   );
 };
 
-export const OpenClawDownloadPage = () => (
-  <DownloadProduct
-    badge="OpenClaw Product"
-    title="OpenClaw One-click Launcher"
-    description="기존 메인 다운로드를 OpenClaw 전용 상품 페이지로 옮겼습니다. 운영체제에 맞는 설치 파일을 선택해서 바로 시작할 수 있습니다."
-    links={[
-      {
-        label: "무료 다운로드 (Win)",
-        href: "https://github.com/Aaron-Kim33/MellowCat/releases/latest/download/MellowCat_Win.exe",
-      },
-      {
-        label: "무료 다운로드 (Mac)",
-        href: "https://github.com/Aaron-Kim33/MellowCat/releases/latest/download/MellowCat_Mac.zip",
-      },
-    ]}
-    note="Windows와 macOS를 모두 지원합니다."
-  />
-);
+export const DownloadRedirect = () => <Navigate to="/download/launcher" replace />;
 
-export const ClaudeCodeDownloadPage = () => (
+export const LauncherDownloadPage = () => (
   <DownloadProduct
-    badge="ClaudeCode Product"
-    title="ClaudeCode Launcher"
-    description="ClaudeCode 전용 런처 다운로드 페이지입니다. 운영체제에 맞는 최신 설치 파일을 선택해서 바로 시작할 수 있습니다."
+    badge="MellowCat Launcher"
+    title="MellowCat Launcher"
+    description="MellowCat Launcher 다운로드 페이지입니다. 운영체제에 맞는 최신 설치 파일을 선택해서 바로 시작할 수 있습니다."
     links={[
       {
         label: "무료 다운로드 (Win)",
@@ -100,7 +78,7 @@ export const ClaudeCodeDownloadPage = () => (
         href: "https://github.com/Aaron-Kim33/mellowcat-claude-v2/releases/latest/download/MellowCat-Claude-mac-arm64.dmg",
       },
     ]}
-    note="현재는 GitHub latest 릴리스 경로로 연결되어 있습니다. 자산 파일명이 다음 버전에서도 유지되면 자동으로 최신 릴리스를 받게 됩니다."
+    note="현재는 GitHub latest 릴리스 경로로 연결되어 있으며, 자산 파일명이 유지되면 최신 버전을 자동으로 받게 됩니다."
   />
 );
 

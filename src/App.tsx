@@ -2,33 +2,30 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Index from "./pages/Index";
 import Whitepaper from "./pages/Whitepaper.tsx";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import ReactGA from "react-ga4";
-import { ClaudeCodeDownloadPage, OpenClawDownloadPage } from "./pages/DownloadProduct";
-import HelpRedirect, { ClaudeCodeHelpPage, OpenClawHelpPage } from "./pages/Help";
+import { DownloadRedirect, LauncherDownloadPage } from "./pages/DownloadProduct";
+import HelpRedirect, { LauncherHelpPage } from "./pages/Help";
 import PaymentPage, { PaymentCancelPage, PaymentSuccessPage } from "./pages/Payment";
 import { AccountPage, ForgotPasswordPage, LauncherAuthPage, LoginPage, ResetPasswordPage, SignupPage, VerifyEmailPage } from "./pages/Auth";
 
-
-
 const queryClient = new QueryClient();
-// 1. 페이지 뷰를 추적하는 별도의 컴포넌트 생성
+
 const GAListener = () => {
   const location = useLocation();
 
   useEffect(() => {
-    ReactGA.send({ 
-      hitType: "pageview", 
-      page: location.pathname + location.search 
+    ReactGA.send({
+      hitType: "pageview",
+      page: location.pathname + location.search,
     });
   }, [location]);
 
-  return null; // 화면에 아무것도 그리지 않음
+  return null;
 };
 
 const App = () => (
@@ -37,7 +34,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-      <GAListener />
+        <GAListener />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<LoginPage />} />
@@ -50,13 +47,15 @@ const App = () => (
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment/success" element={<PaymentSuccessPage />} />
           <Route path="/payment/cancel" element={<PaymentCancelPage />} />
-          <Route path="/download/openclaw" element={<OpenClawDownloadPage />} />
-          <Route path="/download/claudecode" element={<ClaudeCodeDownloadPage />} />
+          <Route path="/download" element={<DownloadRedirect />} />
+          <Route path="/download/launcher" element={<LauncherDownloadPage />} />
+          <Route path="/download/openclaw" element={<Navigate to="/download/launcher" replace />} />
+          <Route path="/download/claudecode" element={<Navigate to="/download/launcher" replace />} />
           <Route path="/help" element={<HelpRedirect />} />
-          <Route path="/help/openclaw" element={<OpenClawHelpPage />} />
-          <Route path="/help/claudecode" element={<ClaudeCodeHelpPage />} />
+          <Route path="/help/launcher" element={<LauncherHelpPage />} />
+          <Route path="/help/openclaw" element={<Navigate to="/help/launcher" replace />} />
+          <Route path="/help/claudecode" element={<Navigate to="/help/launcher" replace />} />
           <Route path="/whitepaper" element={<Whitepaper />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
