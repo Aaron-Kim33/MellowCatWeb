@@ -18,7 +18,9 @@ const HeroSection = () => {
             animate={{ y: [0, -8, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
           >
-            ðŸ±
+            <span role="img" aria-label="Cat">
+              {"\u{1F431}"}
+            </span>
           </motion.div>
 
           <div className="mb-6 inline-block rounded-full border border-primary/20 bg-primary/10 px-5 py-2">

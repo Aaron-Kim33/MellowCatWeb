@@ -61,6 +61,9 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 glass">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <a href="/#home" className="flex items-center gap-2 font-display text-xl font-bold text-primary">
+          <span role="img" aria-label="Cat">
+            {"\u{1F431}"}
+          </span>
           MellowCat
         </a>
 
