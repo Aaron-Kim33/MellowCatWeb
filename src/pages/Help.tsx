@@ -1,16 +1,16 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Instagram, Mail, MessageCircle, Send } from "lucide-react";
+import { ArrowLeft, Github, Instagram, Mail } from "lucide-react";
+import { links } from "@/lib/portfolio";
 import type { ReactNode } from "react";
 import { Link, Navigate } from "react-router-dom";
 
 const contactLinks = [
-  { icon: <MessageCircle className="h-5 w-5" />, href: "https://discord.gg/PQ4Evvqw", label: "Discord" },
-  { icon: <span className="text-base font-bold leading-none">@</span>, href: "https://www.threads.com/@mellowcat_kr", label: "Threads" },
-  { icon: <Instagram className="h-5 w-5" />, href: "https://www.instagram.com/mellowcat_kr", label: "Instagram" },
-  { icon: <Mail className="h-5 w-5" />, href: "mailto:hi.mellowcat@gmail.com", label: "Email" },
-  { icon: <Send className="h-5 w-5" />, href: "https://web.telegram.org/a/#8601684253", label: "Telegram" },
+  { icon: <Github className="h-5 w-5" />, href: links.github, label: "GitHub" },
+  { icon: <span className="text-base font-bold leading-none">@</span>, href: links.threads, label: "Threads" },
+  { icon: <Instagram className="h-5 w-5" />, href: links.instagram, label: "Instagram" },
+  { icon: <Mail className="h-5 w-5" />, href: links.email, label: "Email" },
 ];
 
 type FAQItem = {

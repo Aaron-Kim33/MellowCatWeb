@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/projects/mellowcat-launcher",
+      "destination": "/projects/mellowcat-launcher/index.html"
+    },
+    {
+      "source": "/projects/lumber-rush",
+      "destination": "/projects/lumber-rush/index.html"
+    },
+    {
       "source": "/((?!api/|.*\\..*).*)",
       "destination": "/index.html"
     }

@@ -14,7 +14,7 @@ const PaymentSection = () => {
         >
           <h2 className="text-3xl font-display font-bold text-foreground mb-4">후원하기</h2>
           <p className="text-muted-foreground mb-12">
-            MellowCat은 무료입니다. 따뜻한 후원으로 프로젝트를 응원해주세요 ☕
+            포트폴리오와 무료 다운로드는 계속 볼 수 있습니다. 유료 상품 구매는 별도 결제 페이지에서 진행됩니다.
           </p>
 
           <div className="max-w-md mx-auto" id="donate">

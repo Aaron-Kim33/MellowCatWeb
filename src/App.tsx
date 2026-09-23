@@ -12,11 +12,15 @@ import { DownloadRedirect, LauncherDownloadPage } from "./pages/DownloadProduct"
 import HelpRedirect, { LauncherHelpPage } from "./pages/Help";
 import PaymentPage, { PaymentCancelPage, PaymentSuccessPage } from "./pages/Payment";
 import { AccountPage, ForgotPasswordPage, LauncherAuthPage, LoginPage, ResetPasswordPage, SignupPage, VerifyEmailPage } from "./pages/Auth";
+import ProjectPage from "./pages/ProjectPage";
+import { PortfolioLanguageProvider, usePortfolioLanguage } from "./lib/portfolio-language";
+import { projects } from "./lib/portfolio";
 
 const queryClient = new QueryClient();
 
 const GAListener = () => {
   const location = useLocation();
+  const { language } = usePortfolioLanguage();
 
   useEffect(() => {
     ReactGA.send({
@@ -25,11 +29,41 @@ const GAListener = () => {
     });
   }, [location]);
 
+  useEffect(() => {
+    const pathname = location.pathname.replace(/\/$/, "") || "/";
+    const project = projects.find((item) => item.path === pathname);
+    const title = project ? `${project.title} | MellowCat` : "MellowCat | Independent projects";
+    const description = project
+      ? project.seoDescription[language]
+      : language === "ko"
+        ? "MellowCat Launcher와 Lumber Rush를 만드는 개인 개발 프로젝트 포트폴리오입니다."
+        : "An independent portfolio featuring MellowCat Launcher and Lumber Rush.";
+    document.title = title;
+    document.querySelector('meta[name="description"]')?.setAttribute("content", description);
+    document.querySelector('meta[property="og:title"]')?.setAttribute("content", title);
+    document.querySelector('meta[property="og:description"]')?.setAttribute("content", description);
+    const url = `https://mellowcat.xyz${project?.path ?? "/"}`;
+    const image = `https://mellowcat.xyz${project?.image ?? "/launcher-icon.png"}`;
+    document.querySelector('meta[property="og:url"]')?.setAttribute("content", url);
+    document.querySelector('meta[property="og:image"]')?.setAttribute("content", image);
+    document.querySelector('link[rel="canonical"]')?.setAttribute("href", url);
+  }, [language, location.pathname]);
+
+  useEffect(() => {
+    if (!location.hash) {
+      window.scrollTo(0, 0);
+      return;
+    }
+    const frame = window.requestAnimationFrame(() => document.getElementById(location.hash.slice(1))?.scrollIntoView());
+    return () => window.cancelAnimationFrame(frame);
+  }, [location.pathname, location.hash]);
+
   return null;
 };
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <PortfolioLanguageProvider>
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -37,6 +71,8 @@ const App = () => (
         <GAListener />
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/projects/mellowcat-launcher" element={<ProjectPage id="mellowcat-launcher" />} />
+          <Route path="/projects/lumber-rush" element={<ProjectPage id="lumber-rush" />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -60,6 +96,7 @@ const App = () => (
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
+    </PortfolioLanguageProvider>
   </QueryClientProvider>
 );
 

@@ -1,180 +1,118 @@
 import { getCurrentUser, logoutCurrentUser, type CurrentUser } from "@/lib/auth";
+import { usePortfolioLanguage } from "@/lib/portfolio-language";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
-const navItems = [
-  { label: "홈", href: "/#home" },
-  { label: "결제", href: "/payment", isRoute: true },
-  { label: "Download", href: "/download/launcher", isRoute: true },
-  { label: "Help", href: "/help/launcher", isRoute: true },
-  { label: "기부", href: "/#donate" },
-  { label: "백서", href: "/whitepaper", isRoute: true },
-];
-
-const Navbar = () => {
+export default function Navbar() {
+  const { language, setLanguage, t } = usePortfolioLanguage();
   const [open, setOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [authBusy, setAuthBusy] = useState(true);
   const [logoutBusy, setLogoutBusy] = useState(false);
   const navigate = useNavigate();
 
-  const handleNavClick = (item: typeof navItems[number]) => {
-    if (item.isRoute) {
-      navigate(item.href);
+  useEffect(() => {
+    let active = true;
+    void getCurrentUser().then((user) => {
+      if (active) {
+        setCurrentUser(user);
+        setAuthBusy(false);
+      }
+    });
+    return () => { active = false; };
+  }, []);
+
+  const logout = async () => {
+    setLogoutBusy(true);
+    const success = await logoutCurrentUser();
+    setLogoutBusy(false);
+    if (success) {
+      setCurrentUser(null);
+      setOpen(false);
+      navigate("/");
     }
   };
 
-  useEffect(() => {
-    let cancelled = false;
-
-    const loadUser = async () => {
-      const user = await getCurrentUser();
-      if (cancelled) {
-        return;
-      }
-
-      setCurrentUser(user);
-      setAuthBusy(false);
-    };
-
-    void loadUser();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const displayName = currentUser?.displayName || currentUser?.email?.split("@")[0] || "Account";
-
-  const handleLogout = async () => {
-    setLogoutBusy(true);
-    await logoutCurrentUser();
-    setCurrentUser(null);
-    setLogoutBusy(false);
-    setOpen(false);
-    navigate("/");
-  };
+  const navLinks = [
+    { label: t.nav.projects, to: "/#projects" },
+    { label: t.nav.about, to: "/#about" },
+    { label: t.nav.updates, to: "/#updates" },
+    { label: t.nav.contact, to: "/#contact" },
+  ];
+  const productLinks = [
+    { label: "MellowCat Launcher", to: "/projects/mellowcat-launcher" },
+    { label: t.nav.download, to: "/download/launcher" },
+    { label: t.nav.help, to: "/help/launcher" },
+    { label: t.nav.payment, to: "/payment" },
+  ];
+  const accountName = currentUser?.displayName || currentUser?.email?.split("@")[0] || t.nav.account;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <a href="/#home" className="flex items-center gap-2 font-display text-xl font-bold text-primary">
-          <span role="img" aria-label="Cat">
-            {"\u{1F431}"}
-          </span>
-          MellowCat
-        </a>
+    <header className="portfolio-nav">
+      <div className="portfolio-nav-inner">
+        <Link to="/" className="portfolio-brand" onClick={() => setOpen(false)}>
+          <span className="portfolio-brand-mark" aria-hidden="true">{"\u{1F431}"}</span>
+          <span>MellowCat</span>
+        </Link>
 
-        <div className="hidden items-center gap-8 md:flex">
-          {navItems.map((item) =>
-            item.isRoute ? (
-              <button
-                key={item.label}
-                onClick={() => handleNavClick(item)}
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-              >
-                {item.label}
-              </button>
-            ) : (
-              <a
-                key={item.label}
-                href={item.href}
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-              >
-                {item.label}
-              </a>
-            ),
-          )}
-        </div>
+        <nav aria-label="Primary" className="portfolio-nav-links">
+          {navLinks.map((item) => <Link key={item.to} to={item.to}>{item.label}</Link>)}
+          <div className="portfolio-menu-group">
+            <button type="button" className="portfolio-menu-trigger" aria-label={t.nav.product}>
+              {t.nav.product}<ChevronDown size={15} aria-hidden="true" />
+            </button>
+            <div className="portfolio-menu-panel">
+              {productLinks.map((item) => <Link key={item.to} to={item.to}>{item.label}</Link>)}
+            </div>
+          </div>
+        </nav>
 
-        <div className="hidden items-center gap-3 md:flex">
-          {authBusy ? null : currentUser ? (
+        <div className="portfolio-nav-actions">
+          <div className="portfolio-language" role="group" aria-label="Language">
+            <button type="button" className={language === "ko" ? "active" : ""} onClick={() => setLanguage("ko")} aria-pressed={language === "ko"}>KO</button>
+            <span aria-hidden="true">/</span>
+            <button type="button" className={language === "en" ? "active" : ""} onClick={() => setLanguage("en")} aria-pressed={language === "en"}>EN</button>
+          </div>
+          {!authBusy && (currentUser ? (
             <>
-              <Button variant="ghost" asChild>
-                <Link to="/account">{displayName}</Link>
-              </Button>
-              <Button variant="hero-outline" onClick={handleLogout} disabled={logoutBusy}>
-                {logoutBusy ? "Logging out..." : "Log out"}
-              </Button>
+              <Link to="/account" className="portfolio-account-link">{accountName}</Link>
+              <button type="button" className="portfolio-logout" onClick={logout} disabled={logoutBusy}>{t.nav.logout}</button>
             </>
           ) : (
             <>
-              <Button variant="ghost" asChild>
-                <Link to="/login">Login</Link>
-              </Button>
-              <Button variant="hero" asChild>
-                <Link to="/signup">Sign up</Link>
-              </Button>
+              <Link to="/login" className="portfolio-account-link">{t.nav.login}</Link>
+              <Link to="/signup" className="portfolio-nav-signup">{t.nav.signup}</Link>
             </>
-          )}
+          ))}
         </div>
 
-        <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen(!open)}>
-          {open ? <X /> : <Menu />}
-        </Button>
+        <button type="button" className="portfolio-mobile-toggle" aria-expanded={open} aria-label={t.nav.menu} onClick={() => setOpen(!open)}>
+          {open ? <X size={23} /> : <Menu size={23} />}
+        </button>
       </div>
-
       {open && (
-        <div className="border-t border-border bg-background px-4 pb-4 md:hidden">
-          {navItems.map((item) =>
-            item.isRoute ? (
-              <button
-                key={item.label}
-                onClick={() => {
-                  handleNavClick(item);
-                  setOpen(false);
-                }}
-                className="block w-full py-3 text-left text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-              >
-                {item.label}
-              </button>
-            ) : (
-              <a
-                key={item.label}
-                href={item.href}
-                className="block py-3 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-                onClick={() => setOpen(false)}
-              >
-                {item.label}
-              </a>
-            ),
-          )}
-
-          {!authBusy && (
-            <div className="mt-3 flex flex-col gap-3 border-t border-border pt-4">
-              {currentUser ? (
-                <>
-                  <Button variant="ghost" asChild>
-                    <Link to="/account" onClick={() => setOpen(false)}>
-                      {displayName}
-                    </Link>
-                  </Button>
-                  <Button variant="hero-outline" onClick={handleLogout} disabled={logoutBusy}>
-                    {logoutBusy ? "Logging out..." : "Log out"}
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button variant="ghost" asChild>
-                    <Link to="/login" onClick={() => setOpen(false)}>
-                      Login
-                    </Link>
-                  </Button>
-                  <Button variant="hero" asChild>
-                    <Link to="/signup" onClick={() => setOpen(false)}>
-                      Sign up
-                    </Link>
-                  </Button>
-                </>
-              )}
-            </div>
-          )}
-        </div>
+        <nav className="portfolio-mobile-menu" aria-label="Mobile">
+          {navLinks.map((item) => <Link key={item.to} to={item.to} onClick={() => setOpen(false)}>{item.label}</Link>)}
+          <span className="portfolio-mobile-label">{t.nav.product}</span>
+          {productLinks.map((item) => <Link key={item.to} to={item.to} onClick={() => setOpen(false)}>{item.label}</Link>)}
+          <div className="portfolio-mobile-language">
+            <button type="button" onClick={() => setLanguage("ko")} aria-pressed={language === "ko"}>한국어</button>
+            <button type="button" onClick={() => setLanguage("en")} aria-pressed={language === "en"}>English</button>
+          </div>
+          {!authBusy && (currentUser ? (
+            <>
+              <Link to="/account" onClick={() => setOpen(false)}>{accountName}</Link>
+              <button type="button" onClick={logout} disabled={logoutBusy}>{t.nav.logout}</button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" onClick={() => setOpen(false)}>{t.nav.login}</Link>
+              <Link to="/signup" onClick={() => setOpen(false)}>{t.nav.signup}</Link>
+            </>
+          ))}
+        </nav>
       )}
-    </nav>
+    </header>
   );
-};
-
-export default Navbar;
+}
