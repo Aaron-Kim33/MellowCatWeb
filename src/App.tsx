@@ -32,18 +32,18 @@ const GAListener = () => {
   useEffect(() => {
     const pathname = location.pathname.replace(/\/$/, "") || "/";
     const project = projects.find((item) => item.path === pathname);
-    const title = project ? `${project.title} | MellowCat` : "MellowCat | Independent projects";
+    const title = project ? `${project.title} | MellowCat` : language === "ko" ? "MellowCat | Lumber Rush와 독립 개발 프로젝트" : "MellowCat | Lumber Rush and independent projects";
     const description = project
       ? project.seoDescription[language]
       : language === "ko"
-        ? "MellowCat Launcher와 Lumber Rush를 만드는 개인 개발 프로젝트 포트폴리오입니다."
-        : "An independent portfolio featuring MellowCat Launcher and Lumber Rush.";
+        ? "Lumber Rush를 중심으로 게임과 도구를 만드는 MellowCat의 독립 개발 포트폴리오입니다."
+        : "An independent MellowCat portfolio led by Lumber Rush, alongside the MellowCat Launcher.";
     document.title = title;
     document.querySelector('meta[name="description"]')?.setAttribute("content", description);
     document.querySelector('meta[property="og:title"]')?.setAttribute("content", title);
     document.querySelector('meta[property="og:description"]')?.setAttribute("content", description);
     const url = `https://mellowcat.xyz${project?.path ?? "/"}`;
-    const image = `https://mellowcat.xyz${project?.image ?? "/launcher-icon.png"}`;
+    const image = `https://mellowcat.xyz${project?.image ?? "/lumber-rush-icon.png"}`;
     document.querySelector('meta[property="og:url"]')?.setAttribute("content", url);
     document.querySelector('meta[property="og:image"]')?.setAttribute("content", image);
     document.querySelector('link[rel="canonical"]')?.setAttribute("href", url);

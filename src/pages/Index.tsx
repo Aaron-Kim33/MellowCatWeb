@@ -7,39 +7,46 @@ import { Link } from "react-router-dom";
 
 export default function Index() {
   const { language, t } = usePortfolioLanguage();
+  const featuredProject = projects.find((project) => project.id === "lumber-rush")!;
+  const homeProjects = [featuredProject, ...projects.filter((project) => project.id !== featuredProject.id)];
 
   return (
     <div className="portfolio-site">
       <Navbar />
       <main>
-        <section className="portfolio-hero" id="home">
-          <div className="portfolio-orbit portfolio-orbit-one" aria-hidden="true" />
-          <div className="portfolio-orbit portfolio-orbit-two" aria-hidden="true" />
+        <section className="portfolio-hero portfolio-game-hero" id="home">
           <div className="portfolio-container portfolio-hero-content">
             <div className="portfolio-hero-copy">
               <p className="portfolio-eyebrow">{t.home.eyebrow}</p>
-              <h1>{t.home.title}</h1>
-              <p className="portfolio-lead">{t.home.lead}</p>
+              <div className="portfolio-hero-project-label">
+                <img src={featuredProject.image} alt="" />
+                <span>{t.home.featuredLabel}</span>
+              </div>
+              <h1>{featuredProject.title}</h1>
+              <p className="portfolio-hero-tagline">{t.home.title}</p>
+              <p className="portfolio-lead portfolio-lead-wide">{t.home.lead}</p>
+              <p className="portfolio-lead portfolio-lead-compact">{t.home.leadMobile}</p>
+              <p className="portfolio-hero-status"><span aria-hidden="true" />{featuredProject.status[language]}</p>
               <div className="portfolio-hero-actions">
-                <Link to="/#projects" className="portfolio-button portfolio-button-solid">{t.home.viewProjects}<ArrowDownRight size={18} /></Link>
-                <a href={links.email} className="portfolio-button portfolio-button-text">{t.home.contact}<ArrowUpRight size={18} /></a>
+                <Link to={featuredProject.path} className="portfolio-button portfolio-button-solid">{t.home.viewFeatured}<ArrowUpRight size={18} /></Link>
+                <Link to="/#projects" className="portfolio-button portfolio-button-text">{t.home.viewProjects}<ArrowDownRight size={18} /></Link>
               </div>
             </div>
-            <div className="portfolio-hero-art" aria-hidden="true">
-              <div className="portfolio-hero-art-ring" />
-              <div className="portfolio-hero-art-disc"><span>{"\u{1F431}"}</span></div>
-              <span className="portfolio-art-note portfolio-art-note-one">01 / TOOL</span>
-              <span className="portfolio-art-note portfolio-art-note-two">02 / GAME</span>
-            </div>
+            <figure className="portfolio-hero-showcase">
+              <div className="portfolio-hero-showcase-ring" aria-hidden="true" />
+              <img className="portfolio-hero-game-icon" src={featuredProject.image} alt={featuredProject.imageAlt[language]} />
+              {featuredProject.screenshot && featuredProject.screenshotAlt && <img className="portfolio-hero-game-screen" src={featuredProject.screenshot} alt={featuredProject.screenshotAlt[language]} fetchPriority="high" />}
+              <figcaption>{t.home.screenshotCaption}</figcaption>
+            </figure>
           </div>
-          <div className="portfolio-hero-bottom portfolio-container"><span>{t.home.portfolio}</span><span>01 — 02</span></div>
+          <div className="portfolio-hero-bottom portfolio-container"><span>{t.home.portfolio}</span><span>{t.home.heroFootnote}</span></div>
         </section>
 
         <section id="projects" className="portfolio-section portfolio-projects-section">
           <div className="portfolio-container">
             <div className="portfolio-section-heading"><div><p className="portfolio-eyebrow">{t.home.projectsKicker}</p><h2>{t.home.projectsTitle}</h2></div><p>{t.home.projectsIntro}</p></div>
             <div className="portfolio-project-grid">
-              {projects.map((project, index) => (
+              {homeProjects.map((project, index) => (
                 <Link to={project.path} className={`portfolio-project-card ${project.id === "lumber-rush" ? "portfolio-project-forest" : "portfolio-project-launcher"}`} key={project.id}>
                   <div className="portfolio-card-top"><span>0{index + 1} / {project.eyebrow[language]}</span><ArrowUpRight size={22} aria-hidden="true" /></div>
                   <div className={`portfolio-card-visual ${project.screenshot ? "portfolio-card-with-screen" : ""}`}>
@@ -60,7 +67,7 @@ export default function Index() {
         <section id="updates" className="portfolio-section portfolio-updates-section">
           <div className="portfolio-container"><div className="portfolio-section-heading"><div><p className="portfolio-eyebrow">{t.home.updatesKicker}</p><h2>{t.home.updatesTitle}</h2></div><p>{t.home.updatesIntro}</p></div>
             <div className="portfolio-update-list">
-              {projects.map((project, index) => <Link key={project.id} to={project.path} className="portfolio-update-row"><span>0{index + 1}</span><strong>{project.title}</strong><p>{index === 0 ? t.home.updateLauncher : t.home.updateLumber}</p><ArrowUpRight size={19} aria-hidden="true" /></Link>)}
+              {homeProjects.map((project, index) => <Link key={project.id} to={project.path} className="portfolio-update-row"><span>0{index + 1}</span><strong>{project.title}</strong><p>{project.id === "lumber-rush" ? t.home.updateLumber : t.home.updateLauncher}</p><ArrowUpRight size={19} aria-hidden="true" /></Link>)}
             </div>
           </div>
         </section>
