@@ -4,6 +4,8 @@ import { usePortfolioLanguage } from "@/lib/portfolio-language";
 import { links, projects, type ProjectId } from "@/lib/portfolio";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import ProjectMedia from "@/components/ProjectMedia";
+import { lumberResources } from "@/lib/portfolio-content";
 
 export default function ProjectPage({ id }: { id: ProjectId }) {
   const { language, t } = usePortfolioLanguage();
@@ -28,6 +30,8 @@ export default function ProjectPage({ id }: { id: ProjectId }) {
           </div>
         </section>
 
+        <ProjectMedia id={id} />
+
         <section className="portfolio-section portfolio-detail-body">
           <div className="portfolio-container portfolio-detail-content">
             <div><p className="portfolio-eyebrow">01 / {t.project.overview}</p><h2>{project.summary[language]}</h2><p className="portfolio-detail-paragraph">{project.detail[language]}</p></div>
@@ -37,7 +41,7 @@ export default function ProjectPage({ id }: { id: ProjectId }) {
             <div><p className="portfolio-eyebrow">03 / {t.project.process}</p><div className="portfolio-process-grid">{project.process.map((item, index) => <div key={index}><span>0{index + 1}</span><p>{item[language]}</p></div>)}</div></div>
             <div className="portfolio-detail-divider" />
             <div className="portfolio-detail-links"><div><p className="portfolio-eyebrow">04 / {t.project.links}</p><h2>{t.project.status}</h2><p>{project.status[language]}</p></div><div className="portfolio-link-stack">
-              {isGame ? <div className="portfolio-game-notice"><strong>{t.project.gameSite}</strong><span>{t.project.gameNotice}</span></div> : <>
+              {isGame ? <>{lumberResources.map((resource) => <a key={resource.id} href={resource.url} target="_blank" rel="noopener noreferrer">{resource.label[language]}<ArrowUpRight size={18} /></a>)}<div className="portfolio-game-notice"><strong>{t.project.gameSite}</strong><span>{t.project.gameNotice}</span></div></> : <>
                 <Link to="/download/launcher">{t.project.download}<ArrowUpRight size={18} /></Link>
                 <Link to="/help/launcher">{t.project.help}<ArrowUpRight size={18} /></Link>
                 <Link to="/payment">{t.project.payment}<ArrowUpRight size={18} /></Link>

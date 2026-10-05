@@ -4,9 +4,12 @@ import { usePortfolioLanguage } from "@/lib/portfolio-language";
 import { links, projects } from "@/lib/portfolio";
 import { ArrowDownRight, ArrowUpRight, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
+import ProjectMedia from "@/components/ProjectMedia";
+import { contentCopy, developmentNotes, experiments, gameplaySteps, launcherSteps } from "@/lib/portfolio-content";
 
 export default function Index() {
   const { language, t } = usePortfolioLanguage();
+  const c = contentCopy[language];
   const featuredProject = projects.find((project) => project.id === "lumber-rush")!;
   const homeProjects = [featuredProject, ...projects.filter((project) => project.id !== featuredProject.id)];
 
@@ -42,6 +45,11 @@ export default function Index() {
           <div className="portfolio-hero-bottom portfolio-container"><span>{t.home.portfolio}</span><span>{t.home.heroFootnote}</span></div>
         </section>
 
+        <ProjectMedia id="lumber-rush" compact />
+        <div className="portfolio-container portfolio-gameplay-strip">
+          {gameplaySteps.map((step, index) => <div key={index}><span>0{index + 1}</span><h3>{step.title[language]}</h3><p>{step.body[language]}</p></div>)}
+        </div>
+
         <section id="projects" className="portfolio-section portfolio-projects-section">
           <div className="portfolio-container">
             <div className="portfolio-section-heading"><div><p className="portfolio-eyebrow">{t.home.projectsKicker}</p><h2>{t.home.projectsTitle}</h2></div><p>{t.home.projectsIntro}</p></div>
@@ -60,15 +68,28 @@ export default function Index() {
           </div>
         </section>
 
+        <section className="portfolio-section portfolio-workflow-section">
+          <div className="portfolio-container">
+            <div className="portfolio-section-heading"><div><p className="portfolio-eyebrow">{c.workflowKicker}</p><h2>{c.workflowTitle}</h2></div><p>{c.workflowIntro}</p></div>
+            <ol className="portfolio-workflow-grid">{launcherSteps.map((step, index) => <li key={index}><span>0{index + 1}</span><h3>{step.title[language]}</h3><p>{step.body[language]}</p></li>)}</ol>
+            <Link className="portfolio-workflow-link" to="/projects/mellowcat-launcher#mellowcat-launcher-media">{c.workflowLink}<ArrowUpRight size={18} aria-hidden="true" /></Link>
+          </div>
+        </section>
+
+        <section className="portfolio-section portfolio-experiments-section">
+          <div className="portfolio-container">
+            <div className="portfolio-section-heading"><div><p className="portfolio-eyebrow">{c.experimentsKicker}</p><h2>{c.experimentsTitle}</h2></div><p>{c.experimentsIntro}</p></div>
+            <div className="portfolio-experiment-grid">{experiments.map((item) => <article key={item.id} className="portfolio-experiment-card"><div className="portfolio-experiment-meta"><span>{item.number}</span><span>{item.category[language]}</span></div><h3>{item.title}</h3><p>{item.summary[language]}</p><ul className="portfolio-tech-tags">{item.tags.map((tag) => <li key={tag}>{tag}</li>)}</ul><details><summary>{c.readMore}</summary><p>{item.body[language]}</p></details></article>)}</div>
+          </div>
+        </section>
+
         <section id="about" className="portfolio-section portfolio-about-section">
           <div className="portfolio-container portfolio-about-grid"><p className="portfolio-eyebrow">{t.home.aboutKicker}</p><div><h2>{t.home.aboutTitle}</h2><p>{t.home.aboutBody}</p></div></div>
         </section>
 
         <section id="updates" className="portfolio-section portfolio-updates-section">
-          <div className="portfolio-container"><div className="portfolio-section-heading"><div><p className="portfolio-eyebrow">{t.home.updatesKicker}</p><h2>{t.home.updatesTitle}</h2></div><p>{t.home.updatesIntro}</p></div>
-            <div className="portfolio-update-list">
-              {homeProjects.map((project, index) => <Link key={project.id} to={project.path} className="portfolio-update-row"><span>0{index + 1}</span><strong>{project.title}</strong><p>{project.id === "lumber-rush" ? t.home.updateLumber : t.home.updateLauncher}</p><ArrowUpRight size={19} aria-hidden="true" /></Link>)}
-            </div>
+          <div className="portfolio-container"><div className="portfolio-section-heading"><div><p className="portfolio-eyebrow">{t.home.updatesKicker}</p><h2>{t.home.updatesTitle}</h2></div><p>{c.notesIntro}</p></div>
+            <div className="portfolio-note-list">{developmentNotes.map((note) => <details key={note.id}><summary><span className="portfolio-note-project">{note.project}</span><span className="portfolio-note-heading"><strong>{note.title[language]}</strong><span>{note.summary[language]}</span></span><span className="portfolio-note-toggle" aria-hidden="true">+</span></summary><p>{note.body[language]}</p></details>)}</div>
           </div>
         </section>
 

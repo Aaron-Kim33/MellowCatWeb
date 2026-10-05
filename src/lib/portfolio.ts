@@ -1,7 +1,7 @@
 export type Language = "ko" | "en";
 export type ProjectId = "mellowcat-launcher" | "lumber-rush";
 
-type Localized = Record<Language, string>;
+export type Localized = Record<Language, string>;
 
 export type Project = {
   id: ProjectId;
@@ -37,23 +37,23 @@ export const projects: Project[] = [
     eyebrow: { ko: "데스크톱 도구 · 대표 프로젝트", en: "Desktop tool · Featured project" },
     title: "MellowCat Launcher",
     summary: {
-      ko: "AI 워크플로우를 설치하고 실행하며 관리하는 데스크톱 런처",
-      en: "A desktop launcher for installing, running, and managing AI workflows",
+      ko: "AI 워크플로우 실행부터 영상 편집까지 연결하는 데스크톱 도구",
+      en: "A desktop workspace connecting AI workflows and video editing",
     },
     detail: {
-      ko: "복잡한 준비 과정을 줄이고 필요한 도구와 워크플로우에 빠르게 도달하도록 만든 프로젝트입니다. 웹 계정, 런처 로그인, 상품 구매 및 권한 확인 흐름도 연결되어 있습니다.",
-      en: "Built to reduce setup steps and make tools and workflows easier to reach. It also connects web accounts, browser sign-in, product purchases, and access checks.",
+      ko: "Claude Code와 MCP 패키지 실행을 바탕으로 소재 수집, 대본 생성, 음성·자막 편집, 영상 출력까지 이어지는 작업 공간을 만들고 있습니다. 타임라인 편집과 롱폼에서 숏폼 초안을 만드는 기능을 함께 다듬습니다.",
+      en: "Built around Claude Code and MCP packages, this workspace connects source collection, script generation, voice and caption editing, and video export. Current work includes timeline editing and shortform drafts extracted from longform projects.",
     },
     status: { ko: "개발 중 · 배포 파일 제공", en: "In development · Downloads available" },
     highlights: [
-      { ko: "Windows와 macOS용 설치 파일", en: "Windows and macOS installers" },
-      { ko: "브라우저 기반 로그인과 런처 연결", en: "Browser sign-in linked to the launcher" },
-      { ko: "상품 구매 후 권한 새로고침", en: "Purchase access and entitlement refresh" },
+      { ko: "Claude Code·MCP 실행과 콘텐츠 제작 흐름", en: "Claude Code, MCP, and content production workflows" },
+      { ko: "영상·음성·자막을 다루는 타임라인 편집", en: "Timeline editing for video, voice, and captions" },
+      { ko: "롱폼에서 숏폼 초안 추출과 저장", en: "Extracting and saving shortform drafts from longform" },
     ],
     process: [
-      { ko: "설치와 실행 단계를 한 화면에서 찾도록 구성했습니다.", en: "Brought setup and launch steps into one place." },
-      { ko: "웹 로그인과 런처 세션은 1회용 요청으로 연결합니다.", en: "Linked web sign-in and launcher sessions through one-time requests." },
-      { ko: "다운로드, 도움말, 결제는 기존 웹 경로를 유지합니다.", en: "Kept existing download, help, and checkout routes available." },
+      { ko: "생성된 소재를 수동으로 검토하고 편집할 수 있도록 연결했습니다.", en: "Connected generated materials to manual review and editing." },
+      { ko: "재생 속도와 자막이 미리보기·출력에서 일치하도록 다듬고 있습니다.", en: "Aligning playback speed and captions between preview and export." },
+      { ko: "저장된 숏폼 초안을 다시 열어 반복 생성과 AI 호출을 줄입니다.", en: "Reopening saved shortform drafts to reduce repeated generation and AI calls." },
     ],
     seoDescription: {
       ko: "MellowCat Launcher 개발 사례. AI 워크플로우 실행과 관리, 데스크톱 다운로드, 도움말과 계정 연동을 살펴보세요.",
@@ -65,7 +65,7 @@ export const projects: Project[] = [
     path: "/projects/lumber-rush",
     image: "/lumber-rush-icon.png",
     imageAlt: { ko: "Lumber Rush 게임 앱 아이콘", en: "Lumber Rush game app icon" },
-    screenshot: "/lumber-rush-screen.png",
+    screenshot: "/media/lumber-rush-personal.png",
     screenshotAlt: { ko: "개발 중인 Lumber Rush 게임의 실제 플레이 화면", en: "Actual gameplay screen from the Lumber Rush development build" },
     eyebrow: { ko: "Android 게임 · Solana Mobile 대상", en: "Android game · Built for Solana Mobile" },
     title: "Lumber Rush",
@@ -74,23 +74,23 @@ export const projects: Project[] = [
       en: "A mobile game about chopping, collecting, and growing your gear",
     },
     detail: {
-      ko: "나무를 탭해 공격하고 떨어진 목재를 드래그해 회수합니다. 피로도를 관리하며 도끼를 키우고 보석 옵션을 모으는 성장 루프를 실험하고 있습니다. 지갑 연결과 Devnet 기록도 테스트 단계입니다.",
-      en: "Tap trees to attack and drag logs to collect them. The current build explores fatigue, axe upgrades, and gem options. Wallet connection and Devnet records are being tested.",
+      ko: "나무를 길게 눌러 베고 떨어진 목재를 수레나 저장고로 모읍니다. 피로도를 관리하며 도끼와 보석을 키우고, 공동 숲·농장·다람쥐 탐험으로 성장 루프를 확장하고 있습니다. 지갑 로그인과 서버 저장을 연결한 해커톤 프리뷰를 공개했으며, Release 안내 기준 Solana Seeker에서 빌드와 테스트를 진행했습니다.",
+      en: "Hold to chop trees and gather fallen logs into a trolley or storage. Fatigue, axes, and gems shape progression, alongside a shared forest, farming, and squirrel expeditions. The public hackathon preview connects wallet sign-in and server saves; its release notes report builds and tests on a Solana Seeker.",
     },
     status: { ko: "개발/테스트 중 · 정식 출시 전", en: "In development/testing · Not released" },
     highlights: [
-      { ko: "탭 공격과 드래그 수집", en: "Tap attacks and drag-to-collect logs" },
+      { ko: "홀드 벌목과 수레·저장고 수집", en: "Hold-to-chop and trolley or storage collection" },
       { ko: "피로도, 도끼 성장, 보석 옵션", en: "Fatigue, axe growth, and gem options" },
-      { ko: "지갑 연결 및 Devnet 기록 테스트", en: "Wallet connection and Devnet record tests" },
+      { ko: "공동 숲·농장·다람쥐 탐험 프리뷰", en: "Shared forest, farming, and squirrel expedition preview" },
     ],
     process: [
-      { ko: "탭 공격 후 목재를 직접 수집하는 짧은 플레이 루프를 만들었습니다.", en: "Built a short loop around tapping trees and manually collecting logs." },
+      { ko: "벌목 후 목재를 직접 수집하는 짧은 플레이 루프를 만들었습니다.", en: "Built a short loop around chopping trees and manually collecting logs." },
       { ko: "피로도와 장비 성장으로 반복 플레이의 리듬을 조정하고 있습니다.", en: "Tuning repeat play through fatigue and equipment growth." },
-      { ko: "Solana Mobile 지갑 연결과 Devnet 기록을 검증 중입니다.", en: "Validating Solana Mobile wallet connection and Devnet records." },
+      { ko: "공동 시설 성장과 탐험 보상을 연결하고, 테스트용 APK와 플레이 데모를 공개했습니다.", en: "Connected community facility growth to expedition rewards and published a preview APK and gameplay demo." },
     ],
     seoDescription: {
-      ko: "Lumber Rush 개발 사례. Solana Mobile 대상 Android 벌목 성장 게임의 탭 공격, 수집, 도끼 성장과 Devnet 테스트를 소개합니다.",
-      en: "Explore Lumber Rush, an Android chopping game in development for Solana Mobile, with collection, upgrades, and Devnet testing.",
+      ko: "Lumber Rush 개발 사례. Solana Mobile 대상 Android 게임의 벌목, 수집, 도끼 성장과 공동 숲 프리뷰를 소개합니다.",
+      en: "Explore Lumber Rush, an Android game in development for Solana Mobile, with chopping, collection, upgrades, and a shared forest preview.",
     },
   },
 ];
@@ -102,7 +102,7 @@ export const copy = {
       eyebrow: "MELLOWCAT / INDEPENDENT PROJECTS",
       featuredLabel: "지금 가장 집중하는 프로젝트",
       title: "숲에서 시작되는 작은 성장 게임.",
-      lead: "나무를 탭해 베고, 목재를 모아 도끼를 키웁니다. Lumber Rush는 Solana Mobile을 대상으로 개발 중인 Android 게임입니다. MellowCat은 이 게임과 함께 도구를 만드는 개인 개발 포트폴리오입니다.",
+      lead: "나무를 베고, 목재를 모아 도끼를 키웁니다. Lumber Rush는 Solana Mobile을 대상으로 개발 중인 Android 게임입니다. MellowCat은 이 게임과 함께 도구를 만드는 개인 개발 포트폴리오입니다.",
       leadMobile: "나무를 베고, 목재를 모아 도끼를 키우세요. Solana Mobile을 위한 Android 게임을 개발 중입니다.",
       viewFeatured: "Lumber Rush 살펴보기", viewProjects: "모든 프로젝트", screenshotCaption: "실제 개발 빌드 화면", heroFootnote: "개발 중인 게임과 도구",
       contact: "연락하기", projectsKicker: "SELECTED WORK", projectsTitle: "게임도, 도구도 직접 만듭니다.", projectsIntro: "Lumber Rush를 중심으로, AI 워크플로우를 돕는 Launcher도 함께 개발하고 있습니다.",
